@@ -2,7 +2,7 @@
 {
     public class Visit
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public DateTime VisitDate { get; set; } = DateTime.UtcNow;
         public string? UserAgent { get; set; }
         public string? IpAddress { get; set; }
@@ -25,11 +25,5 @@
         public string DeviceInfo => $"{DeviceBrand} {DeviceType}".Trim();
         public string LocationInfo => $"{City}, {Region}, {Country}".Replace(", ,", ",").Trim(',', ' ');
         public bool IsUnique => !string.IsNullOrEmpty(IpAddress);
-
-
-        public Visit()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
     }
 }

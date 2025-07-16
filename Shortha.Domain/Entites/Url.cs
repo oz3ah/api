@@ -1,23 +1,34 @@
 ﻿namespace Shortha.Domain.Entites
 {
-    public class Url
+    public class Url : IBase
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string OriginalUrl { get; set; } = null!;
+        public bool IsDeleted { get; set; } = false;
+        public string OriginalUrl { get; init; } = null!;
         public string ShortCode { get; set; } = null!;
-        public int ClickCount { get; set; } = 0;
+        public int ClickCount { get; private set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? ExpiresAt { get; set; }
-        public bool IsActive { get; set; } = true;
+        public DateTime UpdatedAt { get; set; }
+        public DateTime? ExpiresAt { get; init; }
+        public bool IsActive { get; private set; } = true;
 
-        public string? UserId { get; set; }
-        public virtual AppUser? User { get; set; }
+        public string? UserId { get; init; }
+        public virtual AppUser? User { get; init; }
 
         public virtual ICollection<Visit> Visits { get; set; } = new HashSet<Visit>();
 
         public bool IsExpired => ExpiresAt.HasValue && DateTime.UtcNow > ExpiresAt.Value;
-        public string ShortUrl => $"https://shortha.com/{ShortCode}";
-        public int UniqueVisitorsCount => Visits.Select(v => v.IpAddress).Distinct().Count();
-        public DateTime? LastVisitDate => Visits.OrderByDescending(v => v.VisitDate).FirstOrDefault()?.VisitDate;
+
+        public int UniqueVisitorsCount => Visits?.Select(v => v.IpAddress).Distinct().Count() ?? 0;
+
+        public DateTime? LastVisitDate => Visits?.OrderByDescending(v => v.VisitDate).FirstOrDefault()?.VisitDate;
+
+     
+
+        public void IncrementClick() => ClickCount++;
+        public void MarkAsUpdated() => UpdatedAt = DateTime.UtcNow;
+        public void Deactivate() => IsActive = false;
+        public void Activate() => IsActive = true;
     }
+
 }

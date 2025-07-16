@@ -31,7 +31,7 @@ namespace Shortha.Infrastructre.Configuration
             builder.Property(e => e.CreatedAt);
             // Computed columns
             builder.Ignore(e => e.IsExpired);
-            builder.Ignore(e => e.ShortUrl);
+            builder.Ignore(e => e.ShortCode);
             builder.Ignore(e => e.UniqueVisitorsCount);
             builder.Ignore(e => e.LastVisitDate);
 
