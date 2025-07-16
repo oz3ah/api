@@ -2,9 +2,9 @@
 {
     public enum Roles
     {
-        Normal,
         Admin,
         Pro,
-        Suspended,
+        Free,
+        Suspended
     }
 }
