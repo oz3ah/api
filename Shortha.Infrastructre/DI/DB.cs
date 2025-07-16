@@ -13,11 +13,14 @@ namespace Shortha.Infrastructre.DI
             {
                 var secretService = serviceProvider.GetRequiredService<ISecretService>();
                 var softDeleteInterceptor = serviceProvider.GetRequiredService<SoftDeleteInterceptor>();
+                var updateInterceptor = serviceProvider.GetRequiredService<UpdateTimestampInterceptor>();
                 options
                     .UseNpgsql(secretService.GetSecret("Db"))
                     .EnableDetailedErrors()
                     .EnableSensitiveDataLogging();
                 // The interceptor is injected via AppDb constructor
+                options.AddInterceptors(softDeleteInterceptor);
+                options.AddInterceptors(updateInterceptor);
             });
 
             return services;
