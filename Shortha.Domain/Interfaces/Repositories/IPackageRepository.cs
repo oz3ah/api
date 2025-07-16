@@ -8,9 +8,9 @@ namespace Shortha.Domain.Interfaces.Repositories
     {
         Task<IReadOnlyList<Package>> GetPackages(Expression<Func<Package, bool>>? whereExpression = null);
         Task<Package?> GetPackageById(string packageId, Expression<Func<Package, bool>>? whereExpression = null);
-        Task<Package?> GetPackageByName(PackagesNames packageName);
+        Task<Package?> GetPackageByName(PackagesName packageName);
         Task<Package> CreatePackage(Package package);
         Task<Package> UpdatePackage(Package package);
-        Task<Package> DeletePackage(string packageId);
+        Task<Package?> DeletePackage(string packageId);
     }
 }

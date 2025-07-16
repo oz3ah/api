@@ -1,10 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shortha.Domain.Entites;
 using Shortha.Infrastructre.Configuration;
+using Shortha.Infrastructre.Interceptors;
 
 namespace Shortha.Infrastructre
 {
-    public class AppDb : DbContext
+    public class AppDb(
+        DbContextOptions<AppDb> options,
+        SoftDeleteInterceptor softDeleteInterceptor,
+        UpdateTimestampInterceptor updateTimestampInterceptor)
+        : DbContext(options)
     {
         public DbSet<AppUser> Users { get; set; } = null!;
         public DbSet<Url> Urls { get; set; } = null!;
@@ -15,20 +20,17 @@ namespace Shortha.Infrastructre
 
         public DbSet<Package> Packages { get; set; } = null!;
 
-        public AppDb(DbContextOptions<AppDb> options) : base(options)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.AddInterceptors(softDeleteInterceptor, updateTimestampInterceptor);
         }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new UrlConfiguration());
-            modelBuilder.ApplyConfiguration(new VisitConfiguration());
-            modelBuilder.ApplyConfiguration(new SubscriptionConfiguration());
-            modelBuilder.ApplyConfiguration(new UserConfiguration());
-            modelBuilder.ApplyConfiguration(new PaymentConfiguration());
-            modelBuilder.ApplyConfiguration(new PackageConfiguration());
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDb).Assembly);
             base.OnModelCreating(modelBuilder);
         }
+
     }
 }

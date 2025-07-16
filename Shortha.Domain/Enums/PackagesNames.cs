@@ -1,6 +1,6 @@
 ﻿namespace Shortha.Domain.Enums
 {
-    public enum PackagesNames
+    public enum PackagesName
     {
         Free,
         Pro,

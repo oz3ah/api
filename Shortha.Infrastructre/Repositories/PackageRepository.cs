@@ -26,7 +26,7 @@ namespace Shortha.Infrastructre.Repositories
         }
 
 
-        public async Task<Package?> GetPackageByName(PackagesNames packageName)
+        public async Task<Package?> GetPackageByName(PackagesName packageName)
         {
             return await context.Packages
                                 .FirstOrDefaultAsync(p => p.Name == packageName);
@@ -50,7 +50,7 @@ namespace Shortha.Infrastructre.Repositories
             return package;
         }
 
-        public async Task<Package> DeletePackage(string packageId)
+        public async Task<Package?> DeletePackage(string packageId)
         {
             var package = await GetPackageById(packageId);
 

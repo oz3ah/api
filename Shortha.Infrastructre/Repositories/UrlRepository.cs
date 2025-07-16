@@ -10,6 +10,7 @@ namespace Shortha.Infrastructre.Repositories
     {
         public async Task<Url> CreateUrlAsync(Url url, string? customHash = null)
         {
+            // Has to be from the Service Layer
             if (customHash == null)
             {
                 var urlHash = HashGenerator.GenerateHash(url.OriginalUrl);

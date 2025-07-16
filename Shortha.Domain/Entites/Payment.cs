@@ -2,29 +2,25 @@
 
 namespace Shortha.Domain.Entites
 {
-    public class Payment
+    public class Payment : IBase
     {
-        public string Id { get; set; }
-        public string UserId { get; set; } = null!;
-        public virtual AppUser User { get; set; } = null!;
-        public DateTime? PaymentDate { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public bool IsDeleted { get; set; } = false;
+        public string UserId { get; init; } = null!;
+        public virtual AppUser User { get; init; } = null!;
+        public DateTime? PaymentDate { get; init; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; }
-        public DateTime ExpirationDate { get; set; } = DateTime.UtcNow.AddHours(1);
-        public decimal Amount { get; set; }
-        public string Currency { get; set; } = "EGP";
-        public string? PaymentMethod { get; set; }
-        public string? TransactionId { get; set; }
-        public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+        public DateTime ExpirationDate { get; init; } = DateTime.UtcNow.AddHours(1);
+        public decimal Amount { get; init; }
+        public string Currency { get; init; } = "USD";
+        public string? PaymentMethod { get; init; }
+        public string? TransactionId { get; init; }
+        public PaymentStatus Status { get; init; } = PaymentStatus.Pending;
 
-        public string PackageId { get; set; }
-        public virtual Package Package { get; set; } = null!;
+        public required string PackageId { get; init; }
+        public virtual Package Package { get; init; } = null!;
 
         public bool IsExpired => DateTime.UtcNow > ExpirationDate;
-
-        public Payment()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
     }
 }
