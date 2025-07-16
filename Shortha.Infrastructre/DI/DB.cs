@@ -18,7 +18,7 @@ namespace Shortha.Infrastructre.DI
                     .UseNpgsql(secretService.GetSecret("Db"))
                     .EnableDetailedErrors()
                     .EnableSensitiveDataLogging();
-                // The interceptor is injected via AppDb constructor
+                
                 options.AddInterceptors(softDeleteInterceptor);
                 options.AddInterceptors(updateInterceptor);
             });

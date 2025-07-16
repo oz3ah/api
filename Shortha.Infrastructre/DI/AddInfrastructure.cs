@@ -11,6 +11,7 @@ public static class Infrastructure
         services.AddSecretManager();
         services.AddAuth0();
         services.AddDatabase();
+        services.AddRepositories();
         services.AddSingleton<SoftDeleteInterceptor>();
         services.AddSingleton<UpdateTimestampInterceptor>();
         
