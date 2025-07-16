@@ -1,0 +1,6 @@
+@Shortha_HostAddress = http://localhost:5197
+
+GET {{Shortha_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
