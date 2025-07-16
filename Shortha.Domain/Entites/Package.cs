@@ -1,6 +1,6 @@
 ﻿using Shortha.Domain.Enums;
 
-namespace Shortha.Domain.Models
+namespace Shortha.Domain.Entites
 {
     public class Package
     {

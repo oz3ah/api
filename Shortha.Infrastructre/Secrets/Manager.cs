@@ -1,9 +1,10 @@
 ﻿using Infisical.Sdk;
 using System.Collections.Concurrent;
+using Shortha.Domain.Interfaces;
 
 namespace Shortha.Infrastructre.Secrets
 {
-    internal class Manager
+    internal partial class Manager
     {
 
         public class SecretService(InfisicalClient infisicalClient) : ISecretService
@@ -35,11 +36,6 @@ namespace Shortha.Infrastructre.Secrets
                     throw;
                 }
             }
-        }
-
-        public interface ISecretService
-        {
-            string GetSecret(string name);
         }
     }
 }

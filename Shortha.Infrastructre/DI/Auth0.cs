@@ -3,18 +3,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Shortha.Infrastructre.Auth0;
 using System.Security.Claims;
-
+using Shortha.Domain.Interfaces;
 namespace Shortha.Infrastructre.DI
 {
-    public static class Auth0
+    internal static class Auth0
     {
         public static IServiceCollection AddAuth0(this IServiceCollection services)
         {
+            var secretManager = services.BuildServiceProvider().GetRequiredService<ISecretService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                                     .AddJwtBearer(options =>
                                     {
-                                        options.Authority = $"https://dev-r13gyp2kxbjasb87.us.auth0.com/";
-                                        options.Audience = "https://sortha.api";
+                                        options.Authority = secretManager.GetSecret("Authority");
+                                        options.Audience = secretManager.GetSecret("Audience");
                                         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                                         {
                                             NameClaimType = ClaimTypes.NameIdentifier
@@ -26,7 +27,7 @@ namespace Shortha.Infrastructre.DI
                 options.AddPolicy(
                   "create:url",
                   policy => policy.Requirements.Add(
-                    new HasScopeRequirement("create:url", "https://dev-r13gyp2kxbjasb87.us.auth0.com/")
+                    new HasScopeRequirement("create:url", secretManager.GetSecret("Authority"))
                   )
                 );
             });

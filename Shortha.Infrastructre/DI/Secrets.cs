@@ -1,6 +1,7 @@
 ﻿using dotenv.net;
 using Infisical.Sdk;
 using Microsoft.Extensions.DependencyInjection;
+using Shortha.Domain.Interfaces;
 using static Shortha.Infrastructre.Secrets.Manager;
 
 namespace Shortha.Infrastructre.DI
