@@ -1,5 +1,5 @@
 using Scalar.AspNetCore;
-using Shortha.Domain.DI;
+using Shortha.Application.DI;
 using Shortha.Extenstions;
 using Shortha.Infrastructre.DI;
 
@@ -18,7 +18,7 @@ namespace Shortha
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddInfrastructure();
-            builder.Services.AddDomainServices();
+            builder.Services.AddApplication();
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigins",

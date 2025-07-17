@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shortha.Application\Shortha.Application.csproj" />
     <ProjectReference Include="..\Shortha.Infrastructre\Shortha.Infrastructre.csproj" />
   </ItemGroup>
 

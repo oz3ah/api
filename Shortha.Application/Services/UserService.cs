@@ -1,7 +1,7 @@
 ﻿using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
 
-namespace Shortha.Domain.Services;
+namespace Shortha.Application.Services;
 
 public class UserService(IUserRepository repository) : IUserService
 {
