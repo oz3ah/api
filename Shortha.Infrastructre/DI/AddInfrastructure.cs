@@ -14,6 +14,7 @@ public static class Infrastructure
         services.AddRepositories();
         services.AddSingleton<SoftDeleteInterceptor>();
         services.AddSingleton<UpdateTimestampInterceptor>();
+        services.AddApiClients();
         
         return services;
     }
