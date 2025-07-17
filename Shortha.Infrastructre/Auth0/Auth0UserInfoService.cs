@@ -5,15 +5,11 @@ using Shortha.Domain.Interfaces;
 
 namespace Shortha.Infrastructre.Auth0;
 
-public class Auth0UserInfoService(IAuth0UserInfoApi api, IHttpContextAccessor accessor) : IAuth0UserInfoService
+public class Auth0UserInfoService(IAuth0UserInfoApi api) : IAuth0UserInfoService
 {
-    public async Task<UserInfoDto?> GetUserInfoAsync()
+    public async Task<UserInfoDto?> GetUserInfoAsync(string token)
     {
-        if (accessor.HttpContext != null)
-        {
-            var token = await accessor.HttpContext.GetTokenAsync("access_token");
+      
             return await api.GetUserInfoAsync($"Bearer {token}");
-        }
-        return null;
     }
 }

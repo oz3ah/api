@@ -15,16 +15,12 @@ namespace Shortha.Controllers
         [HttpGet("sync")]
         public async Task<IActionResult> Sync()
         {
+            
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-
-            var userInfo = new UserInfoDto
-                           {
-                               Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
-                                 Name = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
-                                 
-                           };
+   var user =      await    userService.CreateUserAsync(token);
                 
-                return Ok(userInfo);
+                return Ok(user);
         }
     }
 }

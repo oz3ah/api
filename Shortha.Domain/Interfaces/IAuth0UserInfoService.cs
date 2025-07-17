@@ -4,5 +4,5 @@ namespace Shortha.Domain.Interfaces;
 
 public interface IAuth0UserInfoService
 {
-    Task<UserInfoDto?> GetUserInfoAsync();
+    Task<UserInfoDto?> GetUserInfoAsync(string token);
 }
