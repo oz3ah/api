@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Shortha.Infrastructre.Auth0;
 using System.Security.Claims;
+using Shortha.Application.Interfaces;
 using Shortha.Domain.Interfaces;
 namespace Shortha.Infrastructre.DI
 {
@@ -34,6 +35,7 @@ namespace Shortha.Infrastructre.DI
 
             services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
 
+            services.AddScoped<IAuth0ManagementService, Auth0ManagementService>();
 
             return services;
         }

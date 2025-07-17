@@ -16,9 +16,9 @@ namespace Shortha.Controllers
         public async Task<IActionResult> Sync()
         {
             
-            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-   var user =      await    userService.CreateUserAsync(token);
+   var user =      await    userService.CreateUserAsync(userId);
                 
                 return Ok(user);
         }

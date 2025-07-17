@@ -13,8 +13,7 @@ public static class Docs
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 BearerFormat = "JWT",
-                Description =
-                                                            "JWT Authorization header using the Bearer scheme.",
+                Description = "JWT Authorization header using the Bearer scheme.",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.Http,

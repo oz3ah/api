@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shortha.Application\Shortha.Application.csproj" />
     <ProjectReference Include="..\Shortha.Domain\Shortha.Domain.csproj" />
   </ItemGroup>
 
