@@ -1,6 +1,7 @@
 using Scalar.AspNetCore;
 using Serilog;
 using Shortha.Application.DI;
+using Shortha.Application.Dto.AutoMapper;
 using Shortha.Domain.Dto;
 using Shortha.Extenstions;
 using Shortha.Infrastructre.DI;
@@ -19,9 +20,12 @@ namespace Shortha
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddAutoMapper(typeof(UrlConfiguration));
+
             builder.Services.AddSwaggerGen();
             builder.Services.AddInfrastructure();
             builder.Services.AddApplication();
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigins",
@@ -29,14 +33,14 @@ namespace Shortha
                                       .AllowAnyMethod()
                                       .AllowAnyHeader());
             });
-            
+
             builder.Host.AddSerilogLogging();
 
             builder.Services.AddDocs();
 
             var app = builder.Build();
             app.UseOpenTelemetryPrometheusScrapingEndpoint();
-            
+
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseCors();
             app.UseSwagger(opt => { opt.RouteTemplate = "openapi/{documentName}.json"; });

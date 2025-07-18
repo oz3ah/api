@@ -8,8 +8,9 @@ public static class Application
     {
 
         services.AddServices();
-        
+        services.AddValidation();
+
         return services;
     }
-    
+
 }

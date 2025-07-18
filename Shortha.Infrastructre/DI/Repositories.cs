@@ -9,8 +9,9 @@ public static class Repositories
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, UserRepository>();
-        
+        services.AddScoped<IUrlRepository, UrlRepository>();
+
         return services;
     }
-    
+
 }
