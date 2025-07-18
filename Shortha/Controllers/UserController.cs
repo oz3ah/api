@@ -15,7 +15,6 @@ namespace Shortha.Controllers
         [HttpGet("sync")]
         public async Task<IActionResult> Sync()
         {
-            
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
    var user =      await    userService.CreateUserAsync(userId);

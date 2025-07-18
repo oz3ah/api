@@ -1,4 +1,5 @@
 using Scalar.AspNetCore;
+using Serilog;
 using Shortha.Application.DI;
 using Shortha.Domain.Dto;
 using Shortha.Extenstions;
@@ -28,10 +29,14 @@ namespace Shortha
                                       .AllowAnyMethod()
                                       .AllowAnyHeader());
             });
+            
+            builder.Host.AddSerilogLogging();
 
             builder.Services.AddDocs();
 
             var app = builder.Build();
+            app.UseOpenTelemetryPrometheusScrapingEndpoint();
+            
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseCors();
             app.UseSwagger(opt => { opt.RouteTemplate = "openapi/{documentName}.json"; });
@@ -58,7 +63,7 @@ namespace Shortha
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
-
+            app.UseSerilogRequestLogging();
             app.UseAuthorization();
 
 

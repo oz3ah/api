@@ -4,7 +4,7 @@ namespace Shortha.Extenstions;
 
 public static class Docs
 {
-    public static IServiceCollection AddDocs(this IServiceCollection services)
+    internal static IServiceCollection AddDocs(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
 

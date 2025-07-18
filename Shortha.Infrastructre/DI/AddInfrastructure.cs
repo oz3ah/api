@@ -8,6 +8,7 @@ public static class Infrastructure
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
+        services.AddTracing();
         services.AddSecretManager();
         services.AddAuth0();
         services.AddDatabase();
