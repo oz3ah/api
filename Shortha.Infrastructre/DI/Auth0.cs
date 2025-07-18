@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Shortha.Infrastructre.Auth0;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Shortha.Application.Interfaces;
+using Shortha.Domain.Dto;
 using Shortha.Domain.Interfaces;
 namespace Shortha.Infrastructre.DI
 {
@@ -20,6 +23,20 @@ namespace Shortha.Infrastructre.DI
                                         {
                                             NameClaimType = ClaimTypes.NameIdentifier
                                         };
+                                        options.Events = new JwtBearerEvents
+                                        {
+                                            OnChallenge = context =>
+                                            {
+                                                context.HandleResponse(); // Prevent default behavior
+                                                context.Response.StatusCode =
+                                                    StatusCodes.Status401Unauthorized;
+                                                context.Response.ContentType = "application/json";
+
+                                                var error = ErrorResponse.From("Unauthorized access",
+                                                 traceId: context.HttpContext.TraceIdentifier);
+                                                return context.Response.WriteAsJsonAsync(error);
+                                            }
+                                        };
                                     });
 
             services.AddAuthorization(options =>
@@ -34,6 +51,7 @@ namespace Shortha.Infrastructre.DI
 
             services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
 
+            services.AddScoped<IAuth0ManagementService, Auth0ManagementService>();
 
             return services;
         }

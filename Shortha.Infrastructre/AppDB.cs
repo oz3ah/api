@@ -5,11 +5,8 @@ using Shortha.Infrastructre.Interceptors;
 
 namespace Shortha.Infrastructre
 {
-    public class AppDb(
-        DbContextOptions<AppDb> options,
-        SoftDeleteInterceptor softDeleteInterceptor,
-        UpdateTimestampInterceptor updateTimestampInterceptor)
-        : DbContext(options)
+    public class AppDb
+        : DbContext
     {
         public DbSet<AppUser> Users { get; set; } = null!;
         public DbSet<Url> Urls { get; set; } = null!;
@@ -19,11 +16,18 @@ namespace Shortha.Infrastructre
         public DbSet<Subscription> Subscriptions { get; set; } = null!;
 
         public DbSet<Package> Packages { get; set; } = null!;
+    
+      
+        public AppDb(DbContextOptions<AppDb> options) : base(options)
+        {
+            
+           
+            
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.AddInterceptors(softDeleteInterceptor, updateTimestampInterceptor);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
