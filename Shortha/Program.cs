@@ -1,5 +1,6 @@
 using Scalar.AspNetCore;
 using Shortha.Application.DI;
+using Shortha.Domain.Dto;
 using Shortha.Extenstions;
 using Shortha.Infrastructre.DI;
 using Shortha.Middleware;
@@ -39,6 +40,17 @@ namespace Shortha
                 opt.Title = "Shortha API";
                 opt.Theme = ScalarTheme.DeepSpace;
                 opt.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Http11);
+            });
+            app.Use(async (context, next) =>
+            {
+                await next();
+
+                if (context.Response.StatusCode == StatusCodes.Status403Forbidden && !context.Response.HasStarted)
+                {
+                    var error = ErrorResponse.From("Access denied", traceId: context.TraceIdentifier);
+                    context.Response.ContentType = "application/json";
+                    await context.Response.WriteAsJsonAsync(error);
+                }
             });
 
             // Configure the HTTP request pipeline.
