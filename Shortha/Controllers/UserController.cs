@@ -8,7 +8,7 @@ namespace Shortha.Controllers
 {
     [Route("api/user")]
     [ApiController]
-    public class UserController(IUserService userService) : ControllerBase
+    public class UserController(IUserService userService) :  Base
     {
       
         [Authorize]
@@ -20,7 +20,7 @@ namespace Shortha.Controllers
 
    var user =      await    userService.CreateUserAsync(userId);
                 
-                return Ok(user);
+                return Success(user);
         }
     }
 }

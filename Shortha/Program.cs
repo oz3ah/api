@@ -2,6 +2,7 @@ using Scalar.AspNetCore;
 using Shortha.Application.DI;
 using Shortha.Extenstions;
 using Shortha.Infrastructre.DI;
+using Shortha.Middleware;
 
 namespace Shortha
 {
@@ -30,6 +31,7 @@ namespace Shortha
             builder.Services.AddDocs();
 
             var app = builder.Build();
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseCors();
             app.UseSwagger(opt => { opt.RouteTemplate = "openapi/{documentName}.json"; });
             app.MapScalarApiReference(opt =>
