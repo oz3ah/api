@@ -17,7 +17,7 @@ namespace Shortha.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-   var user =      await    userService.CreateUserAsync(userId);
+            var user = await    userService.CreateUserAsync(userId);
                 
                 return Success(user);
         }
