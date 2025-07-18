@@ -29,11 +29,7 @@ namespace Shortha.Infrastructre.Configuration
                    .HasDefaultValue(true);
 
             builder.Property(e => e.CreatedAt);
-            // Computed columns
-            builder.Ignore(e => e.IsExpired);
-            builder.Ignore(e => e.ShortCode);
-            builder.Ignore(e => e.UniqueVisitorsCount);
-            builder.Ignore(e => e.LastVisitDate);
+
 
 
             // Relationships

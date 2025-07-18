@@ -12,7 +12,7 @@
         public DateTime? ExpiresAt { get; init; }
         public bool IsActive { get; private set; } = true;
 
-        public string? UserId { get; init; }
+        public string? UserId { get; set; }
         public virtual AppUser? User { get; init; }
 
         public virtual ICollection<Visit> Visits { get; set; } = new HashSet<Visit>();
@@ -23,7 +23,7 @@
 
         public DateTime? LastVisitDate => Visits?.OrderByDescending(v => v.VisitDate).FirstOrDefault()?.VisitDate;
 
-     
+
 
         public void IncrementClick() => ClickCount++;
         public void MarkAsUpdated() => UpdatedAt = DateTime.UtcNow;

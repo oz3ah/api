@@ -43,11 +43,21 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
         return newUser;
 
 
+    }
 
+    public async Task<AppUser> GetUserById(string userId)
+    {
+        var user = await repository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            throw new NotFoundException("User not found");
+        }
+        return user;
     }
 }
 
 public interface IUserService
 {
     Task<AppUser> CreateUserAsync(string token);
+    Task<AppUser> GetUserById(string userId);
 }
