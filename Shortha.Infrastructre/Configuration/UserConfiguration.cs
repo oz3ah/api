@@ -15,6 +15,8 @@ namespace Shortha.Infrastructre.Configuration
 
             builder.Property(e => e.IsBlocked)
                    .HasDefaultValue(false);
+            
+
 
 
             // Relationships
