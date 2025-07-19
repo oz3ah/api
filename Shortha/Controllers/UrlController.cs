@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Shortha.Application.Dto.Requests.Url;
 using Shortha.Application.Services;
 using System.Security.Claims;
+using Shortha.Domain;
 using Shortha.Extenstions;
+using Shortha.Filters;
 
 namespace Shortha.Controllers
 {
@@ -39,6 +41,16 @@ namespace Shortha.Controllers
             return Ok(urls);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [ServiceFilter(typeof(TrackerFilter))]
+        public async Task<IActionResult> OpenUrl([FromQuery] GetUrlFromCodeRequest submittedHash)
+        {
+            var tracker = HttpContext.Items["Tracker"] as Tracker;
+            // var url = await urlService.OpenUrl(submittedHash.Hash, tracker);
+
+            return Ok(tracker);
+        }
 
     }
 }
