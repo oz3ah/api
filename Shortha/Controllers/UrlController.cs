@@ -29,15 +29,15 @@ namespace Shortha.Controllers
             return Success(url);
         }
 
-        // [HttpGet("my-links")]
-        // [Authorize]
-        // public async Task<IActionResult> GetMyLinks()
-        // {
-        //     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //
-        //     var urls = await urlService.GetUrlsByUserId(userId);
-        //     return Ok(urls);
-        // }
+        [HttpGet("my-links")]
+        [Authorize]
+        public async Task<IActionResult> GetMyLinks()
+        {
+            var userId = User.GetUserId();
+        
+            var urls = await urlService.GetUrlsByUserId(userId);
+            return Ok(urls);
+        }
 
 
     }

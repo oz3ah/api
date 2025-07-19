@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Shortha.Domain.Dto;
 
 namespace Shortha.Infrastructre.Repositories
 {
@@ -44,7 +46,7 @@ namespace Shortha.Infrastructre.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task<(IEnumerable<T> Items, int TotalCount)> GetAsync(
+        public async Task<PaginationResult<T>> GetAsync(
             Expression<Func<T, bool>>? filter = null,
             int pageNumber = 1,
             int pageSize = 10,
@@ -65,7 +67,14 @@ namespace Shortha.Infrastructre.Repositories
                               .Take(pageSize)
                               .ToListAsync();
 
-            return (items, totalCount);
+            return new PaginationResult<T>
+                   {
+                   Items = items,
+                     TotalCount = totalCount,
+                     PageNumber = pageNumber,
+                     PageSize = pageSize,
+                     
+                   };
         }
     }
 }
