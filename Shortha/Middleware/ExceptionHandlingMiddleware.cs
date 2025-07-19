@@ -39,6 +39,12 @@ public class ExceptionHandlingMiddleware(
                     statusCode = (int)HttpStatusCode.Conflict;
                     error = ErrorResponse.From(ex.Message, traceId: context.TraceIdentifier);
                     break;
+                
+                case NoPermissionException:
+                    statusCode = (int)HttpStatusCode.Unauthorized;
+                    error = ErrorResponse.From(ex.Message, traceId: context.TraceIdentifier);
+                    break;
+
 
                 default:
                     statusCode = (int)HttpStatusCode.InternalServerError;

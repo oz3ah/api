@@ -26,7 +26,6 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
             return existingUser;
         }
 
-        // If the user does not exist, create a new AppUser instance
         var newUser = new AppUser
         {
             Id = user.UserId,
@@ -34,7 +33,7 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
             Name = user.Name,
             Picture = user.Picture,
             CreatedAt = user.CreatedAt,
-            LastLoginAt = DateTime.UtcNow, // Set the last login time to now
+            LastLoginAt = user.LastLogin, 
             Provider = user.Identities.First().Provider,
         };
 

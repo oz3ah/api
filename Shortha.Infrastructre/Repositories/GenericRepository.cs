@@ -9,16 +9,10 @@ using System.Threading.Tasks;
 
 namespace Shortha.Infrastructre.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T>(DbContext context) : IGenericRepository<T>
+        where T : class
     {
-        private readonly DbContext _context;
-        private readonly DbSet<T> _dbSet;
-
-        public GenericRepository(DbContext context)
-        {
-            _context = context;
-            _dbSet = context.Set<T>();
-        }
+        private readonly DbSet<T> _dbSet = context.Set<T>();
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
@@ -47,7 +41,7 @@ namespace Shortha.Infrastructre.Repositories
 
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task<(IEnumerable<T> Items, int TotalCount)> GetAsync(

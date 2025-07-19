@@ -5,8 +5,7 @@ using Shortha.Infrastructre.Interceptors;
 
 namespace Shortha.Infrastructre
 {
-    public class AppDb
-        : DbContext
+    public class AppDb(DbContextOptions<AppDb> options) : DbContext(options)
     {
         public DbSet<AppUser> Users { get; set; } = null!;
         public DbSet<Url> Urls { get; set; } = null!;
@@ -16,14 +15,7 @@ namespace Shortha.Infrastructre
         public DbSet<Subscription> Subscriptions { get; set; } = null!;
 
         public DbSet<Package> Packages { get; set; } = null!;
-    
-      
-        public AppDb(DbContextOptions<AppDb> options) : base(options)
-        {
-            
-           
-            
-        }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
