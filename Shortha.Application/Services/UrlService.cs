@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Shortha.Application.Dto.Requests.Url;
+using Shortha.Application.Dto.Responses.Url;
+using Shortha.Application.Exceptions;
 using Shortha.Domain;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
@@ -8,37 +10,54 @@ namespace Shortha.Application.Services
 {
     public class UrlService(IUrlRepository urlRepository, IMapper mapper) : IUrlService
     {
-        public async Task<Url> CreateUrl(UrlCreateRequest urlCreate, string? customHash = null, string? userId = null)
+        public async Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium)
         {
-            var url = new Url()
+            // Reject premium-only features for free users
+            if (!isPremium)
+            {
+                if (!string.IsNullOrWhiteSpace(urlCreate.CustomHash))
+                    throw new NoPermissionException("Custom URL is only available for premium users.");
+
+                if (urlCreate.ExpiresAt.HasValue)
+                    throw new NoPermissionException("Expiration date is only available for premium users.");
+            }
+
+            var url = new Url
             {
                 OriginalUrl = urlCreate.Url,
+                UserId = userId,
+                ExpiresAt = isPremium ? urlCreate.ExpiresAt : null,
             };
-            if (customHash == null)
-            {
-                var urlHash = HashGenerator.GenerateHash(urlCreate.Url);
 
-                // Check if the hash already exists: 1/300,000 Probability of collision, but we can handle it
+            if (string.IsNullOrWhiteSpace(urlCreate.CustomHash))
+            {
+                string urlHash = HashGenerator.GenerateHash(url.OriginalUrl + Guid.NewGuid());
+
                 while (await urlRepository.IsHashExists(urlHash))
                 {
-                    urlHash = HashGenerator.GenerateHash(url.OriginalUrl);
+                    urlHash = HashGenerator.GenerateHash(url.OriginalUrl + Guid.NewGuid());
                 }
 
                 url.ShortCode = urlHash;
             }
             else
             {
-                url.ShortCode = customHash;
-            }
+                bool isExist = await urlRepository.IsHashExists(urlCreate.CustomHash);
+                if (isExist)
+                    throw new ConflictException("Custom hash already exists. Please choose a different one.");
 
+                url.ShortCode = urlCreate.CustomHash;
+            }
 
             await urlRepository.AddAsync(url);
             await urlRepository.SaveAsync();
-            return url;
+
+            return mapper.Map<UrlResponse>(url);
         }
     }
+
     public interface IUrlService
     {
-        Task<Url> CreateUrl(UrlCreateRequest urlCreate, string? customHash = null, string? userId = null);
+        Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium);
     }
 }
