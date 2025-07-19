@@ -1,13 +1,8 @@
-﻿using Shortha.Domain.Interfaces;
-
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using Shortha.Domain.Dto;
+using Shortha.Domain.Interfaces;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Shortha.Domain.Dto;
 
 namespace Shortha.Infrastructre.Repositories
 {
@@ -68,13 +63,39 @@ namespace Shortha.Infrastructre.Repositories
                               .ToListAsync();
 
             return new PaginationResult<T>
-                   {
-                   Items = items,
-                     TotalCount = totalCount,
-                     PageNumber = pageNumber,
-                     PageSize = pageSize,
-                     
-                   };
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+
+            };
+        }
+
+        public Task<bool> IsExistsAsync(Expression<Func<T, bool>> filter)
+        {
+            return _dbSet.AnyAsync(filter);
+
+        }
+
+        public Task<int> CountAsync(Expression<Func<T, bool>>? filter = null)
+        {
+            IQueryable<T> query = _dbSet;
+            if (filter != null)
+                query = query.Where(filter);
+            return query.CountAsync();
+
+        }
+
+        public async Task<T?> GetAsync(Expression<Func<T, bool>>? filter = null, params string[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+            if (filter != null)
+                query = query.Where(filter);
+            foreach (var include in includes)
+                query = query.Include(include);
+            return await query.FirstOrDefaultAsync();
+
         }
     }
 }

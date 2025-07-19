@@ -33,6 +33,12 @@ public class TrackerFilter(IPinfoClient client, ILogger<Serilog.ILogger> logger)
                       .WithBrowser().WithOs().WithBrand().WithModel().WithIp(ipAddress).WithDevice();
 
         var tracker = builder.Build();
+        tracker.UserId = hash;
+        // Var IP Info 
+        var ipInfo = client.IPApi.GetDetailsAsync(ipAddress).GetAwaiter().GetResult();
+        tracker.Country = ipInfo.Country;
+        tracker.City = ipInfo.City;
+        tracker.TimeZone = ipInfo.Timezone;
 
         context.HttpContext.Items["Tracker"] = tracker;
     }

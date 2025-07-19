@@ -19,6 +19,10 @@ namespace Shortha.Application.Dto.AutoMapper
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive)).ReverseMap();
 
             CreateMap<Url, UrlCreateRequest>().ReverseMap();
+            CreateMap<Url, PublicUrlResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.OriginalUrl))
+                .ReverseMap();
         }
     }
 }
