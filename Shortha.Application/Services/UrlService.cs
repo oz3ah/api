@@ -3,6 +3,7 @@ using Shortha.Application.Dto.Requests.Url;
 using Shortha.Application.Dto.Responses.Url;
 using Shortha.Application.Exceptions;
 using Shortha.Domain;
+using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
 
@@ -54,10 +55,17 @@ namespace Shortha.Application.Services
 
             return mapper.Map<UrlResponse>(url);
         }
+
+        public async Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10)
+        {
+            var urls = await urlRepository.GetAsync(filter: u => u.UserId == userId, pageSize : pageSize, pageNumber: page);
+            return mapper.Map<PaginationResult<UrlResponse>>(urls);
+        }
     }
 
     public interface IUrlService
     {
         Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium);
+        Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10);
     }
 }
