@@ -1,5 +1,4 @@
 ﻿using IPinfo;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Shortha.Application.Exceptions;
 using Shortha.Infrastructre;
@@ -15,7 +14,7 @@ public class TrackerFilter(IPinfoClient client) : IActionFilter
         var hash = query["hash"].ToString();
         var fingerprint = query["fingerprint"].ToString();
         var userAgent = context.HttpContext.Request.Headers["User-Agent"].ToString();
-        var ipAddress = context.HttpContext.Features.Get<IHttpConnectionFeature>()?.RemoteIpAddress?.ToString();
+        var ipAddress = context.HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
 
         if (string.IsNullOrEmpty(userAgent)
             || string.IsNullOrEmpty(ipAddress)
