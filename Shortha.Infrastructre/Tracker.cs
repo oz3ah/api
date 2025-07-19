@@ -1,90 +1,75 @@
-﻿using Shortha.Domain;
+﻿using DeviceDetectorNET;
+using Shortha.Domain;
 
 namespace Shortha.Infrastructre;
 
-using DeviceDetectorNET;
-using IPinfo;
-using Shortha.Domain.Dto;
-
-
 public class TrackerBuilder
 {
+    private readonly Tracker _tracker = new();
     private readonly DeviceDetector _deviceDetector;
-    private readonly Tracker _tracker;
-    private readonly IPinfoClient _client;
 
-    public TrackerBuilder(string userAgent,  IPinfoClient client)
+    public TrackerBuilder(string userAgent)
     {
         _deviceDetector = new DeviceDetector(userAgent);
         _deviceDetector.Parse();
+    }
 
-        _client = client;
+    public TrackerBuilder WithIp(string ip)
+    {
+        _tracker.IpAddress = ip;
+        return this;
+    }
 
-        _tracker = new Tracker
+
+    public TrackerBuilder WithOs()
+    {
+        var os = _deviceDetector.GetOs();
+        if (os?.Match != null)
         {
-            UserAgent = userAgent
-        };
+            _tracker.OsName = os.Match.Name;
+        }
+        else
+        {
+            _tracker.OsName = "Unknown";
+        }
+
+        return this;
     }
 
     public TrackerBuilder WithBrowser()
     {
-        _tracker.BrowserName = _deviceDetector.GetClient().Match.Name;
-        _tracker.BrowserVersion = _deviceDetector.GetClient().Match.Version;
+        var client = _deviceDetector.GetClient();
+        if (client?.Match != null)
+        {
+            _tracker.BrowserName = client.Match.Name;
+            _tracker.BrowserVersion = client.Match.Version;
+        }
+        else
+        {
+            _tracker.BrowserName = "Unknown";
+            _tracker.BrowserVersion = "Unknown";
+        }
+
         return this;
     }
 
-    public TrackerBuilder WithOs()
+    public TrackerBuilder WithDevice()
     {
-        _tracker.OsName = _deviceDetector.GetOs().Match.Name;
+        _tracker.Device = _deviceDetector.GetDeviceName();
         return this;
     }
 
     public TrackerBuilder WithBrand()
     {
-        _tracker.DeviceBrand = _deviceDetector.GetBrandName();
+        _tracker.Brand = _deviceDetector.GetBrandName();
         return this;
     }
 
     public TrackerBuilder WithModel()
     {
-        _tracker.DeviceType = _deviceDetector.GetModel();
+        _tracker.Model = _deviceDetector.GetModel();
         return this;
     }
-
-    public TrackerBuilder WithIpAddress(string ip)
-    {
-        var ipInfo = _client.IPApi.GetDetails(ip);
-        if (ipInfo != null)
-        {
-            _tracker.IpAddress = ipInfo.IP;
-            _tracker.Country = ipInfo.Country;
-            _tracker.Region = ipInfo.Region;
-            _tracker.City = ipInfo.City;
-        }
-
-        return this;
-    }
-
-    public TrackerBuilder WithIsBot()
-    {
-        _tracker.IsBot = _deviceDetector.IsBot();
-        return this;
-    }
-
-    public TrackerBuilder WithTimeZone()
-    {
-        if (_tracker.IpAddress != "Unknown")
-        {
-            var ipInfo = _client.IPApi.GetDetails(_tracker.IpAddress);
-            if (ipInfo != null)
-            {
-                _tracker.TimeZone = ipInfo.Timezone;
-            }
-        }
-
-        return this;
-    }
-
 
     public Tracker Build()
     {
