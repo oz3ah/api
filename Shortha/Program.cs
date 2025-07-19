@@ -1,3 +1,4 @@
+using Hangfire;
 using Scalar.AspNetCore;
 using Serilog;
 using Shortha.Application.DI;
@@ -65,7 +66,7 @@ namespace Shortha
             // Configure the HTTP request pipeline.
             app.UseSwagger();
             app.UseSwaggerUI();
-
+            app.UseHangfireDashboard("/dashboard");
             app.UseHttpsRedirection();
             app.UseSerilogRequestLogging();
             app.UseAuthorization();

@@ -47,7 +47,7 @@ namespace Shortha.Controllers
         {
             var tracker = HttpContext.GetTracker();
             var userId = User.GetUserIdOrNull();
-            var url = await urlService.OpenUrl(submittedHash.Hash, );
+            var url = await urlService.OpenUrl(submittedHash.Hash);
 
             return Success(url);
         }
