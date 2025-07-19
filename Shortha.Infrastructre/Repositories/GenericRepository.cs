@@ -4,21 +4,17 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Shortha.Domain.Dto;
 
 namespace Shortha.Infrastructre.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T>(DbContext context) : IGenericRepository<T>
+        where T : class
     {
-        private readonly DbContext _context;
-        private readonly DbSet<T> _dbSet;
-
-        public GenericRepository(DbContext context)
-        {
-            _context = context;
-            _dbSet = context.Set<T>();
-        }
+        private readonly DbSet<T> _dbSet = context.Set<T>();
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
@@ -47,10 +43,10 @@ namespace Shortha.Infrastructre.Repositories
 
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
-        public async Task<(IEnumerable<T> Items, int TotalCount)> GetAsync(
+        public async Task<PaginationResult<T>> GetAsync(
             Expression<Func<T, bool>>? filter = null,
             int pageNumber = 1,
             int pageSize = 10,
@@ -71,7 +67,14 @@ namespace Shortha.Infrastructre.Repositories
                               .Take(pageSize)
                               .ToListAsync();
 
-            return (items, totalCount);
+            return new PaginationResult<T>
+                   {
+                   Items = items,
+                     TotalCount = totalCount,
+                     PageNumber = pageNumber,
+                     PageSize = pageSize,
+                     
+                   };
         }
     }
 }

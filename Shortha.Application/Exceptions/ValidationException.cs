@@ -1,12 +1,6 @@
 ﻿namespace Shortha.Application.Exceptions;
 
-public class ValidationException : Exception
+public class ValidationException(List<string> errors) : Exception("Validation Failed")
 {
-    public List<string> Errors { get; }
-
-    public ValidationException(List<string> errors)
-        : base("Validation Failed")
-    {
-        Errors = errors;
-    }
+    public List<string> Errors { get; } = errors;
 }
