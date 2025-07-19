@@ -4,6 +4,7 @@ using Shortha.Application.DI;
 using Shortha.Application.Dto.AutoMapper;
 using Shortha.Domain.Dto;
 using Shortha.Extenstions;
+using Shortha.Filters;
 using Shortha.Infrastructre.DI;
 using Shortha.Middleware;
 
@@ -25,7 +26,7 @@ namespace Shortha
             builder.Services.AddSwaggerGen();
             builder.Services.AddInfrastructure();
             builder.Services.AddApplication();
-
+            builder.Services.AddScoped<TrackerFilter>();
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigins",
