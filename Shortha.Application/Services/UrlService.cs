@@ -61,7 +61,7 @@ namespace Shortha.Application.Services
             var urls = await urlRepository.GetAsync(filter: u => u.UserId == userId, pageSize: pageSize, pageNumber: page);
             return mapper.Map<PaginationResult<UrlResponse>>(urls);
         }
-        public async Task<PublicUrlResponse> OpenUrl(string shortUrl, Tracker track)
+        public async Task<PublicUrlResponse> OpenUrl(string shortUrl)
         {
             var url = await urlRepository.GetAsync(u => u.ShortCode == shortUrl && u.IsActive);
             if (url is null) throw new NotFoundException("No Url Found");
@@ -77,7 +77,9 @@ namespace Shortha.Application.Services
 
 
             // Increase the click count
-            //await IncreaseCount(url);
+            url.IncrementClick();
+            urlRepository.Update(url);
+            await urlRepository.SaveAsync();
 
             //await visitService.Record(track, url.Id);
 
@@ -90,6 +92,6 @@ namespace Shortha.Application.Services
     {
         Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium);
         Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10);
-        Task<PublicUrlResponse> OpenUrl(string shortUrl, Tracker track);
+        Task<PublicUrlResponse> OpenUrl(string shortUrl);
     }
 }
