@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Shortha.Application.Dto.Requests.Url;
 using Shortha.Application.Services;
-using System.Security.Claims;
-using Shortha.Domain;
 using Shortha.Extenstions;
 using Shortha.Filters;
+using System.Security.Claims;
 
 namespace Shortha.Controllers
 {
@@ -36,7 +35,7 @@ namespace Shortha.Controllers
         public async Task<IActionResult> GetMyLinks()
         {
             var userId = User.GetUserId();
-        
+
             var urls = await urlService.GetUrlsByUserId(userId);
             return Ok(urls);
         }
@@ -46,10 +45,11 @@ namespace Shortha.Controllers
         [ServiceFilter(typeof(TrackerFilter))]
         public async Task<IActionResult> OpenUrl([FromQuery] GetUrlFromCodeRequest submittedHash)
         {
-            var tracker = HttpContext.Items["Tracker"] as Tracker;
-            // var url = await urlService.OpenUrl(submittedHash.Hash, tracker);
+            var tracker = HttpContext.GetTracker();
+            var userId = User.GetUserIdOrNull();
+            var url = await urlService.OpenUrl(submittedHash.Hash, tracker);
 
-            return Ok(tracker);
+            return Success(url);
         }
 
     }

@@ -58,14 +58,38 @@ namespace Shortha.Application.Services
 
         public async Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10)
         {
-            var urls = await urlRepository.GetAsync(filter: u => u.UserId == userId, pageSize : pageSize, pageNumber: page);
+            var urls = await urlRepository.GetAsync(filter: u => u.UserId == userId, pageSize: pageSize, pageNumber: page);
             return mapper.Map<PaginationResult<UrlResponse>>(urls);
         }
+        public async Task<PublicUrlResponse> OpenUrl(string shortUrl, Tracker track)
+        {
+            var url = await urlRepository.GetAsync(u => u.ShortCode == shortUrl && u.IsActive);
+            if (url is null) throw new NotFoundException("No Url Found");
+
+            if (url.IsExpired)
+            {
+                url.Deactivate();
+                urlRepository.Update(url);
+                await urlRepository.SaveAsync();
+                throw new NotFoundException("This URL has expired.");
+            }
+
+
+
+            // Increase the click count
+            //await IncreaseCount(url);
+
+            //await visitService.Record(track, url.Id);
+
+            return mapper.Map<PublicUrlResponse>(url);
+        }
+
     }
 
     public interface IUrlService
     {
         Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium);
         Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10);
+        Task<PublicUrlResponse> OpenUrl(string shortUrl, Tracker track);
     }
 }
