@@ -14,7 +14,9 @@ public class TrackerFilter(IPinfoClient client, ILogger<Serilog.ILogger> logger)
         var hash = query["hash"].ToString();
         var fingerprint = query["fingerprint"].ToString();
         var userAgent = context.HttpContext.Request.Headers["User-Agent"].ToString();
-        var ipAddress = context.HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+        var ipAddress = context.HttpContext.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
+         ??
+        context.HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
 
         logger.LogInformation("TrackerFilter: UserAgent: {UserAgent}, IP: {IpAddress}, Hash: {Hash}, Fingerprint: {Fingerprint}",
             userAgent, ipAddress, hash, fingerprint);
