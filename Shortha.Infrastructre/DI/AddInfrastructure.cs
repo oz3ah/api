@@ -10,6 +10,7 @@ public static class Infrastructure
     {
         services.AddTracing();
         services.AddSecretManager();
+        services.AddIpTracker();
         services.AddAuth0();
         services.AddDatabase();
         services.AddRepositories();

@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Shortha.Domain.Dto;
 
 namespace Shortha.Domain.Interfaces
 {
@@ -11,11 +12,9 @@ namespace Shortha.Domain.Interfaces
         void Delete(T entity);
         Task SaveAsync();
 
-        Task<(IEnumerable<T> Items, int TotalCount)> GetAsync(
-            Expression<Func<T, bool>>? filter = null,
-            int pageNumber = 1,
-            int pageSize = 10,
-            params string[] includes
-        );
+        Task<PaginationResult<T>> GetAsync(Expression<Func<T, bool>>? filter = null,
+                                      int pageNumber = 1,
+                                      int pageSize = 10,
+                                      params string[] includes);
     }
 }
