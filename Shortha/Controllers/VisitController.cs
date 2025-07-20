@@ -10,7 +10,7 @@ namespace Shortha.Controllers
     {
         [HttpGet("{shortUrl}")]
         [Authorize]
-        public async Task<IActionResult> GetVisitsByShortUrl([FromQuery] string shortUrl, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetVisitsByShortUrl(string shortUrl, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
 
             var visits = await service.GetVisitsByShortUrl(shortUrl, page, pageSize);
