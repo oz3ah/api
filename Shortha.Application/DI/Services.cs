@@ -12,6 +12,7 @@ internal static class Services
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUrlService, UrlService>();
+        services.AddScoped<IVisitService, VisitService>();
 
         return services;
     }

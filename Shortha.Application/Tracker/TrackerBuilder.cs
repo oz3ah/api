@@ -1,7 +1,7 @@
 ﻿using DeviceDetectorNET;
 using Shortha.Domain;
 
-namespace Shortha.Infrastructre;
+namespace Shortha.Application;
 
 public class TrackerBuilder
 {

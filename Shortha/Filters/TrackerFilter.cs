@@ -1,12 +1,12 @@
-﻿using IPinfo;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Shortha.Application.Exceptions;
-using Shortha.Infrastructre;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Shortha.Domain;
+using Shortha.Extenstions;
 
 namespace Shortha.Filters;
 
-public class TrackerFilter(IPinfoClient client, ILogger<Serilog.ILogger> logger) : IActionFilter
+public class TrackerFilter(ILogger<Serilog.ILogger> logger) : IActionFilter
 {
+
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
@@ -17,30 +17,23 @@ public class TrackerFilter(IPinfoClient client, ILogger<Serilog.ILogger> logger)
         var ipAddress = context.HttpContext.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
          ??
         context.HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+        var userId = context.HttpContext.User.GetUserIdOrNull();
+        logger.LogInformation("TrackerFilter: UserAgent: {UserAgent}, IP: {IpAddress}, Hash: {Hash}, Fingerprint: {Fingerprint} User ID:{userID}",
+            userAgent, ipAddress, hash, fingerprint, userId);
 
-        logger.LogInformation("TrackerFilter: UserAgent: {UserAgent}, IP: {IpAddress}, Hash: {Hash}, Fingerprint: {Fingerprint}",
-            userAgent, ipAddress, hash, fingerprint);
 
-        if (string.IsNullOrEmpty(userAgent)
-            || string.IsNullOrEmpty(ipAddress)
-            || string.IsNullOrEmpty(hash)
-            || string.IsNullOrEmpty(fingerprint))
+        context.HttpContext.Items["RequestInfo"] = new RequestInfo()
         {
-            throw new UrlAccessException("Some required parameters are missing in the request.");
-        }
+            hash = hash,
+            fingerprint = fingerprint,
+            ipAddress = ipAddress,
+            userAgent = userAgent,
+            userId = userId
+        };
 
-        var builder = new TrackerBuilder(userAgent)
-                      .WithBrowser().WithOs().WithBrand().WithModel().WithIp(ipAddress).WithDevice();
 
-        var tracker = builder.Build();
-        tracker.UserId = hash;
-        // Var IP Info 
-        var ipInfo = client.IPApi.GetDetailsAsync(ipAddress).GetAwaiter().GetResult();
-        tracker.Country = ipInfo.Country;
-        tracker.City = ipInfo.City;
-        tracker.TimeZone = ipInfo.Timezone;
 
-        context.HttpContext.Items["Tracker"] = tracker;
+
     }
 
     public void OnActionExecuted(ActionExecutedContext context)

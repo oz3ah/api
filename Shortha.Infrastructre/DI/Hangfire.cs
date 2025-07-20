@@ -1,7 +1,9 @@
 ﻿using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.Extensions.DependencyInjection;
+using Shortha.Application.Interfaces;
 using Shortha.Domain.Interfaces;
+using Shortha.Infrastructre.Background_Jobs;
 
 namespace Shortha.Infrastructre.DI
 {
@@ -18,6 +20,8 @@ namespace Shortha.Infrastructre.DI
 
             });
             services.AddHangfireServer();
+            services.AddScoped<IBackgroundJobService, HangfireJobService>();
+
             return services;
         }
     }

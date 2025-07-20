@@ -45,9 +45,9 @@ namespace Shortha.Controllers
         [ServiceFilter(typeof(TrackerFilter))]
         public async Task<IActionResult> OpenUrl([FromQuery] GetUrlFromCodeRequest submittedHash)
         {
-            var tracker = HttpContext.GetTracker();
+            var request = HttpContext.GetRequestInfo();
             var userId = User.GetUserIdOrNull();
-            var url = await urlService.OpenUrl(submittedHash.Hash);
+            var url = await urlService.OpenUrl(submittedHash.Hash, request);
 
             return Success(url);
         }
