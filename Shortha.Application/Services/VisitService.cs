@@ -1,12 +1,15 @@
-﻿using IPinfo;
+﻿using AutoMapper;
+using IPinfo;
+using Shortha.Application.Dto.Responses.Visit;
 using Shortha.Domain;
+using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Application.Services
 {
 
-    public class VisitService(IVisitRepository repo, IPinfoClient client) : IVisitService
+    public class VisitService(IVisitRepository repo, IMapper mapper, IPinfoClient client) : IVisitService
     {
         private async Task<Tracker> DispatchTracker(RequestInfo request)
         {
@@ -47,6 +50,28 @@ namespace Shortha.Application.Services
             await repo.AddAsync(visit);
             await repo.SaveAsync();
 
+        }
+
+        //public async Task<PaginationResult<Visit>> GetVisitsByUser(string userId, int page = 1, int pageSize = 10)
+        //{
+        //    var visits = await repo.GetAsync(u => u.Url.UserId == userId, page, pageSize, "Url");
+        //    return new PaginationResult<VisitsResponse>
+        //    {
+        //        Items = visits.Items,
+        //        TotalCount = visits.TotalCount,
+        //        PageNumber = page,
+        //        PageSize = pageSize,
+
+        //    };
+        //}
+
+        public async Task<PaginationResult<VisitsResponse>> GetVisitsByShortUrl(string shortUrl, int page = 1, int pageSize = 1)
+        {
+
+
+            var visits = await repo.GetAsync(u => u.Url.ShortCode == shortUrl, page, pageSize);
+
+            return mapper.Map<PaginationResult<VisitsResponse>>(visits);
         }
     }
 }

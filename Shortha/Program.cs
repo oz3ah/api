@@ -21,7 +21,7 @@ namespace Shortha
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddAutoMapper(typeof(UrlConfiguration));
+            builder.Services.AddAutoMapper(typeof(Default).Assembly);
 
             builder.Services.AddSwaggerGen();
             builder.Services.AddInfrastructure();
