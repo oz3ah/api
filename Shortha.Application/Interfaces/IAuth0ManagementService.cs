@@ -5,4 +5,5 @@ namespace Shortha.Application.Interfaces;
 public interface IAuth0ManagementService
 {
     Task<Auth0UserResponse> GetUserInfoAsync(string userId);
+    Task AssignRoleToUser(string name, string userId);
 }
