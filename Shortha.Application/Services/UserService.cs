@@ -33,15 +33,15 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
             Name = user.Name,
             Picture = user.Picture,
             CreatedAt = user.CreatedAt,
-            LastLoginAt = user.LastLogin, 
+            LastLoginAt = user.LastLogin,
             Provider = user.Identities.First().Provider,
         };
+
+        await auth0.AssignRoleToUser("Free", user.UserId);
 
         await repository.AddAsync(newUser);
         await repository.SaveAsync();
         return newUser;
-
-
     }
 
     public async Task<AppUser> GetUserById(string userId)
@@ -51,6 +51,7 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
         {
             throw new NotFoundException("User not found");
         }
+
         return user;
     }
 }
