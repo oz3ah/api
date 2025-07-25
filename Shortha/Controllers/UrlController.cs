@@ -37,7 +37,7 @@ namespace Shortha.Controllers
             var userId = User.GetUserId();
 
             var urls = await urlService.GetUrlsByUserId(userId, page, pageSize);
-            return Ok(urls);
+            return Success(urls);
         }
 
         [HttpGet]
