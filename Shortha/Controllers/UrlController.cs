@@ -32,11 +32,11 @@ namespace Shortha.Controllers
 
         [HttpGet("my-links")]
         [Authorize]
-        public async Task<IActionResult> GetMyLinks()
+        public async Task<IActionResult> GetMyLinks([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var userId = User.GetUserId();
 
-            var urls = await urlService.GetUrlsByUserId(userId);
+            var urls = await urlService.GetUrlsByUserId(userId, page, pageSize);
             return Ok(urls);
         }
 
@@ -51,6 +51,5 @@ namespace Shortha.Controllers
 
             return Success(url);
         }
-
     }
 }
