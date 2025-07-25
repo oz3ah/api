@@ -27,12 +27,9 @@ namespace Shortha
             builder.Services.AddInfrastructure();
             builder.Services.AddApplication();
             builder.Services.AddScoped<TrackerFilter>();
-            builder.Services.AddCors(options =>
+            builder.Services.AddCors(c =>
             {
-                options.AddPolicy("AllowAllOrigins",
-                                  builder => builder.AllowAnyOrigin()
-                                                    .AllowAnyMethod()
-                                                    .AllowAnyHeader());
+                c.AddDefaultPolicy(d => d.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
 
             builder.Host.AddSerilogLogging();
@@ -43,7 +40,7 @@ namespace Shortha
             app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
-            app.UseCors("AllowAllOrigins");
+            app.UseCors();
             app.UseSwagger(opt => { opt.RouteTemplate = "openapi/{documentName}.json"; });
             app.MapScalarApiReference(opt =>
             {
