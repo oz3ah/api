@@ -62,6 +62,7 @@ namespace Shortha.Application.Services
             var urls = await repo.GetAsync(filter: u => u.UserId == userId, pageSize: pageSize, pageNumber: page);
             return mapper.Map<PaginationResult<UrlResponse>>(urls);
         }
+
         public async Task<PublicUrlResponse> OpenUrl(string shortUrl, RequestInfo request)
         {
             var url = await repo.GetAsync(u => u.ShortCode == shortUrl && u.IsActive);
@@ -76,7 +77,6 @@ namespace Shortha.Application.Services
             }
 
 
-
             url.IncrementClick();
             repo.Update(url);
             await repo.SaveAsync();
@@ -86,6 +86,15 @@ namespace Shortha.Application.Services
             return mapper.Map<PublicUrlResponse>(url);
         }
 
+        public async Task<UrlResponse> DeactivateUrl(string id, string userId)
+        {
+            var url = await repo.GetAsync(u => u.Id == id && u.UserId == userId);
+            if (url is null) throw new NotFoundException("No Url Found");
+            url.Deactivate();
+            repo.Update(url);
+            await repo.SaveAsync();
+            return mapper.Map<UrlResponse>(url);
+        }
     }
 
     public interface IUrlService
@@ -93,5 +102,6 @@ namespace Shortha.Application.Services
         Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium);
         Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10);
         Task<PublicUrlResponse> OpenUrl(string shortUrl, RequestInfo request);
+        Task<UrlResponse> DeactivateUrl(string id, string userId);
     }
 }

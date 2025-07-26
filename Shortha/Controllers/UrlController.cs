@@ -30,6 +30,16 @@ namespace Shortha.Controllers
             return Success(url);
         }
 
+        [HttpGet("deactivate/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeactivateUrl(string id)
+        {
+            var userId = User.GetUserId();
+
+            var url = await urlService.DeactivateUrl(id, userId);
+            return Success(url);
+        }
+
         [HttpGet("my-links")]
         [Authorize]
         public async Task<IActionResult> GetMyLinks([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
