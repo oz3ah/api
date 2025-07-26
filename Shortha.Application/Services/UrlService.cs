@@ -59,7 +59,8 @@ namespace Shortha.Application.Services
 
         public async Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10)
         {
-            var urls = await repo.GetAsync(filter: u => u.UserId == userId, pageSize: pageSize, pageNumber: page);
+            var urls = await repo.GetAsync(filter: u => u.UserId == userId, pageSize: pageSize, pageNumber: page,
+                                           orderBy: u => u.CreatedAt);
             return mapper.Map<PaginationResult<UrlResponse>>(urls);
         }
 

@@ -45,6 +45,7 @@ namespace Shortha.Infrastructre.Repositories
             Expression<Func<T, bool>>? filter = null,
             int pageNumber = 1,
             int pageSize = 10,
+            Expression<Func<T, object>>? orderBy = null, bool descending = false,
             params string[] includes
         )
         {
@@ -57,6 +58,15 @@ namespace Shortha.Infrastructre.Repositories
                 query = query.Include(include);
 
             var totalCount = await query.CountAsync();
+
+
+            if (orderBy != null)
+            {
+                query = descending
+                    ? query.OrderByDescending(orderBy)
+                    : query.OrderBy(orderBy);
+            }
+
             var items = await query
                               .Skip((pageNumber - 1) * pageSize)
                               .Take(pageSize)
@@ -68,14 +78,12 @@ namespace Shortha.Infrastructre.Repositories
                 TotalCount = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-
             };
         }
 
         public Task<bool> IsExistsAsync(Expression<Func<T, bool>> filter)
         {
             return _dbSet.AnyAsync(filter);
-
         }
 
         public Task<int> CountAsync(Expression<Func<T, bool>>? filter = null)
@@ -84,18 +92,18 @@ namespace Shortha.Infrastructre.Repositories
             if (filter != null)
                 query = query.Where(filter);
             return query.CountAsync();
-
         }
 
-        public async Task<T?> GetAsync(Expression<Func<T, bool>>? filter = null, params string[] includes)
+        public async Task<T?> GetAsync(Expression<Func<T, bool>>? filter = null,
+                                       params string[] includes)
         {
             IQueryable<T> query = _dbSet;
             if (filter != null)
                 query = query.Where(filter);
             foreach (var include in includes)
                 query = query.Include(include);
-            return await query.FirstOrDefaultAsync();
 
+            return await query.FirstOrDefaultAsync();
         }
     }
 }
