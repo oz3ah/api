@@ -3,7 +3,7 @@ name: Build and Push Docker image
 on:
   push:
     branches: [ master ]
-  workflow_dispatch:
+
 
 jobs:
   build-and-push:
@@ -31,3 +31,13 @@ jobs:
       - name: Push Docker image
         run: |
           docker push c7nasr/shortha:latest
+
+      - name: Trigger Coolify Deploy + NTFY
+        uses: gitnasr/coolify-trigger-deploy@v2.0.0
+        with:
+          docker_image: ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+          ntfy_topic: ${{ secrets.NTFY_TOPIC }}
+          ntfy_token: ${{ secrets.NTFY_TOKEN }}
+          coolify_url: ${{ secrets.COOLIFY_URL }}
+          coolify_resource_id: ${{ secrets.COOLIFY_RESOURCE_ID }}
+          coolify_api_token: ${{ secrets.COOLIFY_API_TOKEN }}
