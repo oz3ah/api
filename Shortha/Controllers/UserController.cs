@@ -31,7 +31,11 @@ namespace Shortha.Controllers
             }
 
             var user = await userService.GetUserById(userId);
-            return Success(user);
+            return Success(new
+            {
+                user = user.Item1,
+                stats = user.Item2
+            });
         }
     }
 }
