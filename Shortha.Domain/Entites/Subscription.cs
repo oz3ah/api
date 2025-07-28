@@ -17,17 +17,17 @@
         public virtual Payment Payment { get; init; } = null!;
         public required string PaymentId { get; init; }
 
-        public required string UserId { get; init; } 
+        public required string UserId { get; init; }
         public virtual AppUser User { get; init; } = null!;
 
         public required string PackageId { get; init; }
         public virtual Package Package { get; init; } = null!;
-
+        public string CreatedBy { get; set; }
+        public string UpdatedBy { get; set; }
 
         // Helper properties
         public bool IsExpired => DateTime.UtcNow > EndDate;
         public TimeSpan TimeRemaining => EndDate > DateTime.UtcNow ? EndDate - DateTime.UtcNow : TimeSpan.Zero;
         public void Deactivate() => IsActive = false;
-
     }
 }

@@ -4,10 +4,12 @@ using Serilog;
 using Shortha.Application.DI;
 using Shortha.Application.Dto.AutoMapper;
 using Shortha.Domain.Dto;
+using Shortha.Domain.Interfaces;
 using Shortha.Extenstions;
 using Shortha.Filters;
 using Shortha.Infrastructre.DI;
 using Shortha.Middleware;
+using Shortha.Providers;
 
 namespace Shortha
 {
@@ -31,6 +33,8 @@ namespace Shortha
             {
                 c.AddDefaultPolicy(d => d.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddScoped<ICurrentSessionProvider, CurrentSessionProvider>();
 
             builder.Host.AddSerilogLogging();
 

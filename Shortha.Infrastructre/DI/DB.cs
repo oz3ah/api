@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Shortha.Domain.Interfaces;
 using Shortha.Infrastructre.Interceptors;
 
@@ -13,15 +14,17 @@ namespace Shortha.Infrastructre.DI
             {
                 var secretService = serviceProvider.GetRequiredService<ISecretService>();
                 var softDeleteInterceptor = serviceProvider.GetRequiredService<SoftDeleteInterceptor>();
-                var updateInterceptor = serviceProvider.GetRequiredService<UpdateTimestampInterceptor>();
+                var auditableInterceptor = serviceProvider.GetRequiredService<AuditableInterceptor>();
                 options
                     .UseNpgsql(secretService.GetSecret("Db"))
                     .EnableDetailedErrors()
                     .EnableSensitiveDataLogging();
-                
+
                 options.AddInterceptors(softDeleteInterceptor);
-                options.AddInterceptors(updateInterceptor);
+                options.AddInterceptors(auditableInterceptor);
             });
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            NpgsqlConnection.GlobalTypeMapper.EnableDynamicJson();
 
             return services;
         }

@@ -5,7 +5,6 @@ namespace Shortha.Infrastructre.DI;
 
 public static class Infrastructure
 {
-
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         services.AddTracing();
@@ -15,11 +14,10 @@ public static class Infrastructure
         services.AddDatabase();
         services.AddRepositories();
         services.AddSingleton<SoftDeleteInterceptor>();
-        services.AddSingleton<UpdateTimestampInterceptor>();
+        services.AddSingleton<AuditableInterceptor>();
         services.AddApiClients();
         services.RegisterHangfire();
 
         return services;
     }
-
 }

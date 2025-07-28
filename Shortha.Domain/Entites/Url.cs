@@ -23,12 +23,12 @@
 
         public DateTime? LastVisitDate => Visits?.OrderByDescending(v => v.VisitDate).FirstOrDefault()?.VisitDate;
 
-
+        public string CreatedBy { get; set; }
+        public string UpdatedBy { get; set; }
 
         public void IncrementClick() => ClickCount++;
         public void MarkAsUpdated() => UpdatedAt = DateTime.UtcNow;
         public void Deactivate() => IsActive = false;
         public void Activate() => IsActive = true;
     }
-
 }
