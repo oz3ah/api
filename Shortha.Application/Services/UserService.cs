@@ -1,11 +1,13 @@
-﻿using Shortha.Application.Exceptions;
+﻿using Shortha.Application.Dto.Responses.Url;
+using Shortha.Application.Exceptions;
 using Shortha.Application.Interfaces;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Application.Services;
 
-public class UserService(IUserRepository repository, IAuth0ManagementService auth0) : IUserService
+public class UserService(IUserRepository repository, IAuth0ManagementService auth0, IUrlService urlService)
+    : IUserService
 {
     public async Task<AppUser> CreateUserAsync(string userId)
     {
@@ -44,7 +46,7 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
         return newUser;
     }
 
-    public async Task<AppUser> GetUserById(string userId)
+    public async Task<(AppUser, UserUrlStatsResponse)> GetUserById(string userId)
     {
         var user = await repository.GetByIdAsync(userId);
         if (user == null)
@@ -52,12 +54,13 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
             throw new NotFoundException("User not found");
         }
 
-        return user;
+        var stats = await urlService.GetUserStats(user.Id);
+        return (user, stats);
     }
 }
 
 public interface IUserService
 {
     Task<AppUser> CreateUserAsync(string token);
-    Task<AppUser> GetUserById(string userId);
+    Task<(AppUser, UserUrlStatsResponse)> GetUserById(string userId);
 }

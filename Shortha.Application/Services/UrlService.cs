@@ -96,6 +96,23 @@ namespace Shortha.Application.Services
             await repo.SaveAsync();
             return mapper.Map<UrlResponse>(url);
         }
+
+        public async Task<UserUrlStatsResponse> GetUserStats(string userId)
+        {
+            var TotalUrlsCount = await repo.CountAsync(u => u.UserId == userId);
+            var TotalClicksCount = await repo.GetTotalClicksByUserId(userId);
+            var TotalActiveUrlsCount = await repo.CountAsync(u => u.UserId == userId && u.IsActive);
+            var totalThisMonth =
+                await repo.CountAsync(u => u.UserId == userId && u.CreatedAt >= DateTime.UtcNow.AddMonths(-1));
+
+            return new UserUrlStatsResponse()
+            {
+                TotalActiveUrlsCount = TotalActiveUrlsCount,
+                TotalClicksCount = TotalClicksCount,
+                TotalUrlsCount = TotalUrlsCount,
+                TotalThisMonth = totalThisMonth
+            };
+        }
     }
 
     public interface IUrlService
@@ -104,5 +121,6 @@ namespace Shortha.Application.Services
         Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10);
         Task<PublicUrlResponse> OpenUrl(string shortUrl, RequestInfo request);
         Task<UrlResponse> DeactivateUrl(string id, string userId);
+        Task<UserUrlStatsResponse> GetUserStats(string userId);
     }
 }
