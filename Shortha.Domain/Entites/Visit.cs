@@ -20,6 +20,9 @@
 
         public string UrlId { get; set; }
         public virtual Url Url { get; set; } = null!;
+        public string CreatedBy { get; set; }
+
+        public string UpdatedBy { get; set; }
 
         // Helper properties for analytics
         public string DeviceInfo => $"{DeviceBrand} {DeviceType}".Trim();
