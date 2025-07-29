@@ -1,6 +1,7 @@
 ﻿using Shortha.Application.Dto.Responses.Url;
 using Shortha.Application.Exceptions;
 using Shortha.Application.Interfaces;
+using Shortha.Application.Interfaces.Services;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
 
@@ -57,10 +58,4 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
         var stats = await urlService.GetUserStats(user.Id);
         return (user, stats);
     }
-}
-
-public interface IUserService
-{
-    Task<AppUser> CreateUserAsync(string token);
-    Task<(AppUser, UserUrlStatsResponse)> GetUserById(string userId);
 }

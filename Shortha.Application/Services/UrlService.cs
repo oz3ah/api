@@ -3,6 +3,7 @@ using Shortha.Application.Dto.Requests.Url;
 using Shortha.Application.Dto.Responses.Url;
 using Shortha.Application.Exceptions;
 using Shortha.Application.Interfaces;
+using Shortha.Application.Interfaces.Services;
 using Shortha.Domain;
 using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
@@ -113,14 +114,5 @@ namespace Shortha.Application.Services
                 TotalThisMonth = totalThisMonth
             };
         }
-    }
-
-    public interface IUrlService
-    {
-        Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium);
-        Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10);
-        Task<PublicUrlResponse> OpenUrl(string shortUrl, RequestInfo request);
-        Task<UrlResponse> DeactivateUrl(string id, string userId);
-        Task<UserUrlStatsResponse> GetUserStats(string userId);
     }
 }

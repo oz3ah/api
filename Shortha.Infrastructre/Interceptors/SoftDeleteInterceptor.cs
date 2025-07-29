@@ -1,22 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Shortha.Domain.Entites;
 
 namespace Shortha.Infrastructre.Interceptors
 {
     public class SoftDeleteInterceptor : SaveChangesInterceptor
     {
-        public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+        public override InterceptionResult<int> SavingChanges(DbContextEventData eventData,
+                                                              InterceptionResult<int> result)
         {
             UpdateEntities(eventData.Context);
             return base.SavingChanges(eventData, result);
         }
 
-        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
         {
             UpdateEntities(eventData.Context);
             return base.SavingChangesAsync(eventData, result, cancellationToken);
@@ -27,7 +25,7 @@ namespace Shortha.Infrastructre.Interceptors
             if (context == null) return;
 
             var entries = context.ChangeTracker.Entries<IBase>()
-                .Where(e => e.State == EntityState.Deleted || e.State == EntityState.Modified);
+                                 .Where(e => e.State == EntityState.Deleted || e.State == EntityState.Modified);
 
             foreach (var entry in entries)
             {
@@ -36,9 +34,9 @@ namespace Shortha.Infrastructre.Interceptors
                     entry.State = EntityState.Modified;
                     entry.Entity.IsDeleted = true;
                 }
+
                 entry.Entity.UpdatedAt = DateTime.UtcNow;
             }
         }
     }
 }
-
