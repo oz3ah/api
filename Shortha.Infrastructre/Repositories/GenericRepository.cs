@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shortha.Domain.Dto;
 using Shortha.Domain.Interfaces;
-using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
 namespace Shortha.Infrastructre.Repositories

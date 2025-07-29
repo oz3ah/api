@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shortha.Application.Dto.Requests.Url;
-using Shortha.Application.Services;
+using Shortha.Application.Interfaces.Services;
 using Shortha.Extenstions;
 using Shortha.Filters;
 using System.Security.Claims;
