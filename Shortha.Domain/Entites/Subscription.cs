@@ -14,8 +14,8 @@
 
 
         // Navigation properties
-        public virtual Payment Payment { get; init; } = null!;
-        public required string PaymentId { get; init; }
+        public virtual Payment Payment { get; set; } = null!; // Assuming a subscription is linked to a payment
+        public required string PaymentId { get; set; } = null!;
 
         public required string UserId { get; init; }
         public virtual AppUser User { get; init; } = null!;
