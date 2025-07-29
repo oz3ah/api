@@ -13,10 +13,10 @@ namespace Shortha.Domain.Entites
         public DateTime UpdatedAt { get; set; }
         public DateTime ExpirationDate { get; init; } = DateTime.UtcNow.AddHours(1);
         public decimal Amount { get; init; }
-        public string Currency { get; init; } = "USD";
-        public string? PaymentMethod { get; init; }
-        public string? TransactionId { get; init; }
-        public PaymentStatus Status { get; init; } = PaymentStatus.Pending;
+        public string Currency { get; set; } = "USD";
+        public string? PaymentMethod { get; set; }
+        public string? TransactionId { get; set; }
+        public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
         public required string PackageId { get; init; }
