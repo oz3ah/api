@@ -48,4 +48,8 @@
     <ProjectReference Include="..\Shortha.Domain\Shortha.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Units\" />
+  </ItemGroup>
+
 </Project>

@@ -12,7 +12,10 @@ internal static class Services
         services.AddScoped<IUrlService, UrlService>();
         services.AddScoped<IVisitService, VisitService>();
         services.AddScoped<IPackagesService, PackagesService>();
-        
+        services.AddScoped<IPaymentService, PaymentService>();
+        services.AddScoped<ISubscriptionService, SubscriptionService>();
+        services.AddScoped<IKahsierService, KahsierService>();
+
 
         return services;
     }
