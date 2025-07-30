@@ -1,4 +1,8 @@
-﻿using Shortha.Application.Exceptions;
+﻿using AutoMapper;
+using Shortha.Application.AutoMapper;
+using Shortha.Application.Dto.Responses.Package;
+using Shortha.Application.Exceptions;
+using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Enums;
 using Shortha.Domain.Interfaces.Repositories;
@@ -14,7 +18,7 @@ public class UpdatePackageDto
 
 public interface IPackagesService
 {
-    // Define methods for package management
+    Task<PaginationResult<PackageInfoDto>> GetActivePackages();
     Task<Package> AddPackage(PackagesName name, string packageDetails, decimal price, int duration);
     Task RemovePackage(string packageId);
     Task DeactivatePackage(string packageId);
@@ -22,7 +26,7 @@ public interface IPackagesService
     Task UpdatePackage(UpdatePackageDto updatedPackage, string packageId);
 }
 
-public class PackagesService(IPackageRepository repo) : IPackagesService
+public class PackagesService(IPackageRepository repo, IMapper mapper) : IPackagesService
 {
     public async Task<Package> AddPackage(PackagesName name, string packageDetails, decimal price, int duration)
     {
@@ -104,5 +108,16 @@ public class PackagesService(IPackageRepository repo) : IPackagesService
         //4. Save the changes
         repo.Update(package);
         await repo.SaveAsync();
+    }
+
+    public async Task<PaginationResult<PackageInfoDto>> GetActivePackages()
+    {
+        var packages = await repo.GetAsync(p => p.IsActive,1,10, p => p.CreatedAt, false);
+        
+        var mapped = mapper.Map<PaginationResult<PackageInfoDto>>(packages);
+
+        return mapped;
+
+
     }
 }

@@ -11,6 +11,8 @@ internal static class Services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUrlService, UrlService>();
         services.AddScoped<IVisitService, VisitService>();
+        services.AddScoped<IPackagesService, PackagesService>();
+        
 
         return services;
     }

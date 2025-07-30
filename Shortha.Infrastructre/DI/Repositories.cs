@@ -11,6 +11,7 @@ public static class Repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUrlRepository, UrlRepository>();
         services.AddScoped<IVisitRepository, VisitRepository>();
+        services.AddScoped<IPackageRepository, PackageRepository>();
 
         return services;
     }
