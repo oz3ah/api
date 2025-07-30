@@ -7,6 +7,7 @@ using Shortha.Domain.Dto;
 using Shortha.Domain.Interfaces;
 using Shortha.Extenstions;
 using Shortha.Filters;
+using Shortha.Infrastructre;
 using Shortha.Infrastructre.DI;
 using Shortha.Middleware;
 using Shortha.Providers;
@@ -63,6 +64,12 @@ namespace Shortha
                     await context.Response.WriteAsJsonAsync(error);
                 }
             });
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                 Seeder.SeedPackagesAsync(services).Wait();
+            }
 
             // Configure the HTTP request pipeline.
             app.UseHangfireDashboard("/dashboard");
