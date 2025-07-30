@@ -1,5 +1,7 @@
 ﻿using Shortha.Application.Exceptions;
 using Shortha.Domain.Entites;
+using Shortha.Domain.Enums;
+using Shortha.Domain.Interfaces;
 using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Application.Services;
@@ -14,34 +16,75 @@ public interface ISubscriptionService
     void DowngradeSubscription(string userId, string newPlanId);
 }
 
-public class SubscriptionService(ISubscriptionRepository repo) : ISubscriptionService
+public class SubscriptionService(
+    ISubscriptionRepository repo,
+    IPackagesService packages,
+    IPaymentService payments,
+    IUnitOfWork ef)
+    : ISubscriptionService
 {
     public async Task<Subscription> Subscribe(string userId, string planId)
     {
-        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(planId))
-        {
-            throw new ArgumentException("User ID and Plan ID cannot be null or empty.");
-        }
+        // Start a transaction to ensure atomicity
 
-        var subscription = new Subscription
+        await ef.BeginTransactionAsync();
+
+        try
         {
-            UserId = userId,
-            PackageId = planId,
-            PaymentId = null
-        };
-        await repo.AddAsync(subscription);
-        await repo.SaveAsync();
-        return subscription;
+            // Check if the user is already subscribed
+            if (await IsSubscribed(userId))
+            {
+                throw new ConflictException($"User {userId} is already subscribed.");
+            }
+
+            var package = await packages.GetPackageDetails(planId);
+            if (package.Name == PackagesName.Free)
+            {
+                throw new NoPermissionException("Free package does not require a subscription.");
+            }
+
+            var payment = await payments.Create(package, userId);
+
+            var subscription = new Subscription
+            {
+                UserId = userId,
+                PackageId = planId,
+                PaymentId = payment.Id,
+            };
+            await repo.AddAsync(subscription);
+            await repo.SaveAsync();
+            // Create payment link
+            var paymentLink = payments.GeneratePaymentLink(subscription.Id, package);
+
+            // Update the payment with the payment link
+
+            var payload = new PaymentUpdateDto
+            {
+                PaymentLink = paymentLink
+            };
+
+            await payments.Update(payload, payment.Id);
+            await repo.SaveAsync();
+
+            // Commit the transaction
+            await ef.CommitAsync();
+            // Return the created subscription
+
+
+            return subscription;
+        }
+        catch (Exception e)
+        {
+            await ef.RollbackAsync();
+            throw;
+        }
     }
 
- 
 
     public async Task<bool> IsSubscribed(string userId)
     {
-        
         var subscription = await repo.GetAsync(s => s.UserId == userId && s.IsActive);
         return subscription != null;
-        
     }
 
     public async Task Unsubscribe(string userId)
@@ -55,7 +98,6 @@ public class SubscriptionService(ISubscriptionRepository repo) : ISubscriptionSe
         subscription.Deactivate();
         repo.Update(subscription);
         await repo.SaveAsync();
-       
     }
 
     public void UpgradeSubscription(string userId, string newPlanId)

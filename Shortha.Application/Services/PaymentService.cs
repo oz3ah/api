@@ -7,23 +7,25 @@ namespace Shortha.Application.Services;
 
 public class PaymentUpdateDto
 {
-   
-        public PaymentStatus? Status { get; set; }
-        public string? Currency { get; set; }
-        public string? TransactionId { get; set; }
-        public string? PaymentMethod { get; set; }
+    public PaymentStatus? Status { get; set; }
+    public string? Currency { get; set; }
+    public string? TransactionId { get; set; }
+    public string? PaymentMethod { get; set; }
+
+    public string? PaymentLink { get; set; }
 }
+
 public interface IPaymentService
 {
     // Define methods for payment processing, e.g., ProcessPayment, RefundPayment, etc.
     Task<Payment> Create(Package package, string userId);
     Task<Payment> CreateVoid(string packageId, string userId);
     Task<Payment?> GetPendingByUser(string userId);
-    
+    string GeneratePaymentLink(string subscriptionId, Package package);
     Task<Payment> Update(PaymentUpdateDto paymentUpdateDto, string paymentId);
 }
 
-public class PaymentService(IPaymentRepository repo) : IPaymentService
+public class PaymentService(IPaymentRepository repo, IKahsierService kahsier) : IPaymentService
 {
     public async Task<Payment> Create(Package package, string userId)
     {
@@ -31,12 +33,18 @@ public class PaymentService(IPaymentRepository repo) : IPaymentService
                       {
                           UserId = userId,
                           Amount = package.Price,
-                          PackageId = package.Id
+                          PackageId = package.Id,
                       };
         await repo.AddAsync(payment);
         await repo.SaveAsync();
         return payment;
-        
+    }
+
+    public string GeneratePaymentLink(string subscriptionId, Package package)
+    {
+        var paymentLink = kahsier.Url(subscriptionId, package);
+
+        return paymentLink;
     }
 
     public async Task<Payment> CreateVoid(string packageId, string userId)
@@ -54,9 +62,9 @@ public class PaymentService(IPaymentRepository repo) : IPaymentService
                           UserId = userId
                       };
 
-         await repo.AddAsync(payment);
+        await repo.AddAsync(payment);
         await repo.SaveAsync();
-            return payment;
+        return payment;
     }
 
     public async Task<Payment?> GetPendingByUser(string userId)
@@ -77,21 +85,29 @@ public class PaymentService(IPaymentRepository repo) : IPaymentService
         {
             payment.Status = paymentUpdateDto.Status.Value;
         }
+
         if (!string.IsNullOrEmpty(paymentUpdateDto.Currency))
         {
             payment.Currency = paymentUpdateDto.Currency;
         }
+
         if (!string.IsNullOrEmpty(paymentUpdateDto.TransactionId))
         {
             payment.TransactionId = paymentUpdateDto.TransactionId;
         }
+
         if (!string.IsNullOrEmpty(paymentUpdateDto.PaymentMethod))
         {
             payment.PaymentMethod = paymentUpdateDto.PaymentMethod;
         }
+
+        if (!string.IsNullOrEmpty(paymentUpdateDto.PaymentLink))
+        {
+            payment.PaymentLink = paymentUpdateDto.PaymentLink;
+        }
+
         repo.Update(payment);
         await repo.SaveAsync();
         return payment;
-
     }
 }

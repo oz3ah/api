@@ -32,6 +32,7 @@ namespace Shortha.Infrastructre.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
@@ -70,6 +71,7 @@ namespace Shortha.Infrastructre.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("UpdatedBy")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -203,6 +205,9 @@ namespace Shortha.Infrastructre.Migrations
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("PaymentLink")
+                        .HasColumnType("text");
+
                     b.Property<string>("PaymentMethod")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
@@ -241,6 +246,7 @@ namespace Shortha.Infrastructre.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("EndDate")
@@ -269,6 +275,7 @@ namespace Shortha.Infrastructre.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("UpdatedBy")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
@@ -300,6 +307,7 @@ namespace Shortha.Infrastructre.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("CreatedBy")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ExpiresAt")
@@ -327,6 +335,7 @@ namespace Shortha.Infrastructre.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("UpdatedBy")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")

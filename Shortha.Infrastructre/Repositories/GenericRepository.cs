@@ -72,12 +72,12 @@ namespace Shortha.Infrastructre.Repositories
                               .ToListAsync();
 
             return new PaginationResult<T>
-            {
-                Items = items,
-                TotalCount = totalCount,
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-            };
+                   {
+                       Items = items,
+                       TotalCount = totalCount,
+                       PageNumber = pageNumber,
+                       PageSize = pageSize,
+                   };
         }
 
         public Task<bool> IsExistsAsync(Expression<Func<T, bool>> filter)
