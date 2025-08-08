@@ -19,8 +19,8 @@ namespace Shortha.Domain.Entites
         public string? PaymentMethod { get; set; }
         public string? TransactionId { get; set; }
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
-        public string? CreatedBy { get; set; }
-        public string? UpdatedBy { get; set; }
+        public string? CreatedBy { get; set; } = "system";
+        public string? UpdatedBy { get; set; } = "system";
         public required string PackageId { get; init; }
         public virtual Package Package { get; init; } = null!;
 
