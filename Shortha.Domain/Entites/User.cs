@@ -13,8 +13,9 @@
         public DateTime LastLoginAt { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedAt { get; set; }
-        public string CreatedBy { get; set; }
-        public string UpdatedBy { get; set; }
+        public string CreatedBy { get; set; } = "system";
+        public string UpdatedBy { get; set; } = "system";
+
         public string Provider { get; set; } = null!;
 
         public virtual ICollection<Url> Urls { get; set; } = new List<Url>();

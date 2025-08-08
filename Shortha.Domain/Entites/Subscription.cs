@@ -22,8 +22,8 @@
 
         public required string PackageId { get; init; }
         public virtual Package Package { get; init; } = null!;
-        public string CreatedBy { get; set; }
-        public string UpdatedBy { get; set; }
+        public string CreatedBy { get; set; } = "system";
+        public string UpdatedBy { get; set; } = "system";
 
         // Helper properties
         public bool IsExpired => DateTime.UtcNow > EndDate;
