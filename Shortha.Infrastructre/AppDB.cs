@@ -7,7 +7,7 @@ using Shortha.Infrastructre.Audit;
 
 namespace Shortha.Infrastructre
 {
-    public class AppDb(DbContextOptions<AppDb> options, ICurrentSessionProvider CurrentSessionProvider)
+    public class AppDb(DbContextOptions<AppDb> options, ICurrentSessionProvider currentSessionProvider)
         : DbContext(options)
     {
         public DbSet<AppUser> Users { get; set; } = null!;
@@ -23,7 +23,7 @@ namespace Shortha.Infrastructre
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
-            var userId = CurrentSessionProvider.GetUserId();
+            var userId = currentSessionProvider.GetUserId();
 
             SetAuditableProperties(userId);
 

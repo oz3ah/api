@@ -2,10 +2,10 @@
 {
     public class RequestInfo
     {
-        public string? hash { get; set; }
-        public string? fingerprint { get; set; }
-        public string? ipAddress { get; set; }
-        public string? userAgent { get; set; }
-        public string? userId { get; set; }
+        public string? Hash { get; set; }
+        public string? Fingerprint { get; set; }
+        public string? IpAddress { get; set; }
+        public string? UserAgent { get; set; }
+        public string? UserId { get; set; }
     }
 }

@@ -13,17 +13,17 @@ namespace Shortha.Application.Services
     {
         private async Task<Tracker> DispatchTracker(RequestInfo request)
         {
-            var tracker = new TrackerBuilder(request.userAgent)
+            var tracker = new TrackerBuilder(request.UserAgent)
                                 .WithBrowser()
                                 .WithOs()
                                 .WithBrand()
                                 .WithModel()
-                                .WithIp(request.ipAddress)
+                                .WithIp(request.IpAddress)
                                 .WithDevice()
                                 .Build();
 
-            tracker.UserId = request.userId;
-            var ipInfo = await client.IPApi.GetDetailsAsync(request.ipAddress);
+            tracker.UserId = request.UserId;
+            var ipInfo = await client.IPApi.GetDetailsAsync(request.IpAddress);
             tracker.Country = ipInfo.Country;
             tracker.City = ipInfo.City;
             tracker.TimeZone = ipInfo.Timezone;

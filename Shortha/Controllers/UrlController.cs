@@ -39,6 +39,16 @@ namespace Shortha.Controllers
             var url = await urlService.DeactivateUrl(id, userId);
             return Success(url);
         }
+        
+        [HttpGet("activate/{id}")]
+        [Authorize]
+        public async Task<IActionResult> ActivateUrl(string id)
+        {
+            var userId = User.GetUserId();
+
+            var url = await urlService.ActivateUrl(id, userId);
+            return Success(url);
+        }
 
         [HttpGet("my-links")]
         [Authorize]

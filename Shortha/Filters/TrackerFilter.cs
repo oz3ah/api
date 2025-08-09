@@ -22,11 +22,11 @@ public class TrackerFilter(ILogger<Serilog.ILogger> logger) : IActionFilter
 
         context.HttpContext.Items["RequestInfo"] = new RequestInfo()
         {
-            hash = hash,
-            fingerprint = fingerprint,
-            ipAddress = ipAddress,
-            userAgent = userAgent,
-            userId = userId
+            Hash = hash,
+            Fingerprint = fingerprint,
+            IpAddress = ipAddress,
+            UserAgent = userAgent,
+            UserId = userId
         };
     }
 

@@ -6,7 +6,7 @@ using Shortha.Infrastructre.Interceptors;
 
 namespace Shortha.Infrastructre.DI
 {
-    internal static class DB
+    internal static class Db
     {
         public static IServiceCollection AddDatabase(this IServiceCollection services)
         {
