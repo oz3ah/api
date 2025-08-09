@@ -11,5 +11,6 @@ public interface IUrlService
     Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10);
     Task<PublicUrlResponse> OpenUrl(string shortUrl, RequestInfo request);
     Task<UrlResponse> DeactivateUrl(string id, string userId);
+    Task<UrlResponse> ActivateUrl(string id, string userId);
     Task<UserUrlStatsResponse> GetUserStats(string userId);
 }

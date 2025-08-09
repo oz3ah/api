@@ -14,17 +14,17 @@ public class KahsierService(ISecretService secretService) : IKahsierService
 {
     private const string BaseUrl = "https://payments.kashier.io/";
 
-    private readonly string Mid = secretService.GetSecret("KashierMID");
+    private readonly string _mid = secretService.GetSecret("KashierMID");
     private const string Currency = "EGP";
 
-    private readonly string SecretApi = secretService.GetSecret("KashierSecret");
+    private readonly string _secretApi = secretService.GetSecret("KashierSecret");
 
     private string CreateHash(decimal amount, string orderId)
     {
-        var path = $"/?payment={Mid}.{orderId}.{amount}.{Currency}";
+        var path = $"/?payment={_mid}.{orderId}.{amount}.{Currency}";
 
 
-        using var hmac = new HMACSHA256(System.Text.Encoding.ASCII.GetBytes(SecretApi));
+        using var hmac = new HMACSHA256(System.Text.Encoding.ASCII.GetBytes(_secretApi));
         var hash = hmac.ComputeHash(System.Text.Encoding.ASCII.GetBytes(path));
         return BitConverter.ToString(hash).Replace("-", "").ToLower();
     }
@@ -33,7 +33,7 @@ public class KahsierService(ISecretService secretService) : IKahsierService
     {
         var query = HttpUtility.ParseQueryString(string.Empty);
 
-        query["merchantId"] = Mid;
+        query["merchantId"] = _mid;
         query["orderId"] = subscriptionId;
         query["amount"] = package.Price.ToString();
         query["currency"] = "EGP";

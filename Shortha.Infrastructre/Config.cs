@@ -2,8 +2,8 @@
 
 public static class Config 
 {
-    public static readonly string appId = Environment.GetEnvironmentVariable("APP_ID") ?? "shortha-gitnasr";
-    public static readonly string appName = Environment.GetEnvironmentVariable("APP_NAME") ?? "shortha";
-    public static readonly string env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "development";
+    public static readonly string AppId = Environment.GetEnvironmentVariable("APP_ID") ?? "shortha-gitnasr";
+    public static readonly string AppName = Environment.GetEnvironmentVariable("APP_NAME") ?? "shortha";
+    public static readonly string Env = Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "development";
 
 }

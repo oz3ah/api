@@ -15,11 +15,11 @@ internal static class OpenTelemetry
 // Configure OpenTelemetry Resources with the application name
         otel.ConfigureResource(resource =>
         {
-            resource.AddService(serviceName: $"{Config.appName}");
+            resource.AddService(serviceName: $"{Config.AppName}");
             var globalOpenTelemetryAttributes = new List<KeyValuePair<string, object>>();
-            globalOpenTelemetryAttributes.Add(new KeyValuePair<string, object>("env", Config.env));
-            globalOpenTelemetryAttributes.Add(new KeyValuePair<string, object>("appId", Config.appId));
-            globalOpenTelemetryAttributes.Add(new KeyValuePair<string, object>("appName", Config.appName));
+            globalOpenTelemetryAttributes.Add(new KeyValuePair<string, object>("env", Config.Env));
+            globalOpenTelemetryAttributes.Add(new KeyValuePair<string, object>("appId", Config.AppId));
+            globalOpenTelemetryAttributes.Add(new KeyValuePair<string, object>("appName", Config.AppName));
             resource.AddAttributes(globalOpenTelemetryAttributes);
         });
 
@@ -31,7 +31,7 @@ internal static class OpenTelemetry
                                     })
                                     // Metrics provider from OpenTelemetry
                                     .AddAspNetCoreInstrumentation()
-                                    .AddMeter(Config.appName)
+                                    .AddMeter(Config.AppName)
                                     // Metrics provides by ASP.NET Core in .NET 8
                                     .AddMeter("Microsoft.AspNetCore.Hosting")
                                     .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
@@ -42,7 +42,7 @@ internal static class OpenTelemetry
         {
             tracing.AddAspNetCoreInstrumentation();
             tracing.AddHttpClientInstrumentation();
-            tracing.AddSource(Config.appName);
+            tracing.AddSource(Config.AppName);
             tracing.AddOtlpExporter(otlpOptions => { otlpOptions.Endpoint = new Uri("https://otl.gitnasr.com:18889"); });
        //     tracing.AddConsoleExporter();
         });

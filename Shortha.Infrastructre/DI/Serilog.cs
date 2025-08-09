@@ -15,9 +15,9 @@ public static class SerilogConfiguration
             config.Enrich.FromLogContext();
             config.Enrich.WithExceptionDetails();
             config.Enrich.With(new SerilogEnricher(
-                                                   Config.appId,
-                                                   Config.appName,
-                                                   Config.env
+                                                   Config.AppId,
+                                                   Config.AppName,
+                                                   Config.Env
                                                   ));
 
             config
@@ -25,9 +25,9 @@ public static class SerilogConfiguration
                     (
                      "https://loki.gitnasr.com",
       
-                     new List<LokiLabel> { new() { Key = "appId", Value = Config.appId }, new() { Key = "appName", Value =
-                                             Config.appName
-                                         }, new() { Key = "env", Value = Config.env } },
+                     new List<LokiLabel> { new() { Key = "appId", Value = Config.AppId }, new() { Key = "appName", Value =
+                                             Config.AppName
+                                         }, new() { Key = "env", Value = Config.Env } },
                      period: TimeSpan.Zero
                     )
                 .WriteTo.Console
