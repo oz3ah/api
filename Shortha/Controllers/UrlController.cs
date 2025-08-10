@@ -39,7 +39,7 @@ namespace Shortha.Controllers
             var url = await urlService.DeactivateUrl(id, userId);
             return Success(url);
         }
-        
+
         [HttpGet("activate/{id}")]
         [Authorize]
         public async Task<IActionResult> ActivateUrl(string id)
@@ -66,7 +66,6 @@ namespace Shortha.Controllers
         public async Task<IActionResult> OpenUrl([FromQuery] GetUrlFromCodeRequest submittedHash)
         {
             var request = HttpContext.GetRequestInfo();
-            var userId = User.GetUserIdOrNull();
             var url = await urlService.OpenUrl(submittedHash.Hash, request);
 
             return Success(url);

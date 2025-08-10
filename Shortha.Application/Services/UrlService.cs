@@ -100,30 +100,12 @@ namespace Shortha.Application.Services
 
         public async Task<UrlResponse> ActivateUrl(string id, string userId)
         {
-        
             var url = await repo.GetAsync(u => u.Id == id && u.UserId == userId);
             if (url is null) throw new NotFoundException("No Url Found");
             url.Activate();
             repo.Update(url);
             await repo.SaveAsync();
             return mapper.Map<UrlResponse>(url);
-        }
-
-        public async Task<UserUrlStatsResponse> GetUserStats(string userId)
-        {
-            var totalUrlsCount = await repo.CountAsync(u => u.UserId == userId);
-            var totalClicksCount = await repo.GetTotalClicksByUserId(userId);
-            var totalActiveUrlsCount = await repo.CountAsync(u => u.UserId == userId && u.IsActive);
-            var totalThisMonth =
-                await repo.CountAsync(u => u.UserId == userId && u.CreatedAt >= DateTime.UtcNow.AddMonths(-1));
-
-            return new UserUrlStatsResponse()
-            {
-                TotalActiveUrlsCount = totalActiveUrlsCount,
-                TotalClicksCount = totalClicksCount,
-                TotalUrlsCount = totalUrlsCount,
-                TotalThisMonth = totalThisMonth
-            };
         }
     }
 }
