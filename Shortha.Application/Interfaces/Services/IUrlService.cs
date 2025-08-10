@@ -12,5 +12,4 @@ public interface IUrlService
     Task<PublicUrlResponse> OpenUrl(string shortUrl, RequestInfo request);
     Task<UrlResponse> DeactivateUrl(string id, string userId);
     Task<UrlResponse> ActivateUrl(string id, string userId);
-    Task<UserUrlStatsResponse> GetUserStats(string userId);
 }
