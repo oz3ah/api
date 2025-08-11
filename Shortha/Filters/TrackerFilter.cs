@@ -12,7 +12,7 @@ public class TrackerFilter(ILogger<Serilog.ILogger> logger) : IActionFilter
         var hash = query["hash"].ToString();
         var fingerprint = query["fingerprint"].ToString();
         var userAgent = context.HttpContext.Request.Headers["User-Agent"].ToString();
-        var ipAddress = context.HttpContext.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
+        var ipAddress = context.HttpContext.Request.Headers["X-Client-IP"].FirstOrDefault()
                         ??
                         context.HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
         var userId = context.HttpContext.User.GetUserIdOrNull();
