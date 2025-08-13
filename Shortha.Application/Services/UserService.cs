@@ -57,4 +57,14 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
         var stats = await analyticsService.GetUserStats(user.Id);
         return (user, stats);
     }
+
+    public Task<AppUser> ChangeSubscriptionType(string userId, bool isPremium)
+    {
+        return repository.UpdateSubscriptionType(isPremium, userId);
+    }
+
+    public async Task AlternateUserRole(string newRole, string userId)
+    {
+        await auth0.AssignRoleToUser(newRole, userId);
+    }
 }
