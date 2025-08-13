@@ -8,12 +8,12 @@ namespace Shortha.Application.Services;
 
 public interface ISubscriptionService
 {
-    // Define methods for subscription management
     Task<Subscription> Subscribe(string userId, string planId);
     Task Unsubscribe(string userId);
     Task<bool> IsSubscribed(string userId);
-    void UpgradeSubscription(string userId, string newPlanId);
-    void DowngradeSubscription(string userId, string newPlanId);
+
+    Task<Subscription> UpgradeSubscription(string paymentId, string transactionId, string method,
+                                           string currency);
 }
 
 public class SubscriptionService(
@@ -100,13 +100,47 @@ public class SubscriptionService(
         await repo.SaveAsync();
     }
 
-    public void UpgradeSubscription(string userId, string newPlanId)
+    public async Task<Subscription> UpgradeSubscription(string paymentId, string transactionId, string method,
+                                                        string currency)
     {
-        throw new NotImplementedException();
-    }
+        await ef.BeginTransactionAsync();
 
-    public void DowngradeSubscription(string userId, string newPlanId)
-    {
-        throw new NotImplementedException();
+        try
+        {
+            var transactionUpdate = new PaymentUpdateDto()
+            {
+                TransactionId = transactionId,
+                PaymentMethod = method,
+                Currency = currency,
+            };
+
+            var payment = await payments.Update(transactionUpdate, paymentId);
+            if (payment == null)
+            {
+                throw new UpdateFailedException("Failed to update payment.");
+            }
+
+            await Unsubscribe(payment.UserId);
+            var newSubscription = new Subscription
+            {
+                UserId = payment.UserId,
+                PackageId = payment.PackageId,
+                PaymentId = payment.Id,
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(payment.Package.DurationInDays),
+            };
+
+            await repo.AddAsync(newSubscription);
+
+            await repo.SaveAsync();
+            await ef.CommitAsync();
+
+            return newSubscription;
+        }
+        catch
+        {
+            await ef.RollbackAsync();
+            throw;
+        }
     }
 }
