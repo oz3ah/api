@@ -14,6 +14,7 @@ public class AnalyticsService(ILogger<AnalyticsService> logger, IUrlRepository r
         var totalThisMonth =
             await repo.CountAsync(u => u.UserId == userId && u.CreatedAt >= DateTime.UtcNow.AddMonths(-1));
 
+
         logger.LogInformation("User {UserId} stats: TotalUrlsCount={TotalUrlsCount}, TotalClicksCount={TotalClicksCount}, TotalActiveUrlsCount={TotalActiveUrlsCount}, TotalThisMonth={TotalThisMonth}");
 
         return new UserUrlStatsResponse()
