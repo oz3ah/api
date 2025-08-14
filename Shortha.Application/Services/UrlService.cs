@@ -72,10 +72,7 @@ namespace Shortha.Application.Services
 
             if (url.IsExpired)
             {
-                url.Deactivate();
-                repo.Update(url);
-                await repo.SaveAsync();
-                throw new NotFoundException("This URL has expired.");
+                throw new UrlAccessException("This URL has expired.");
             }
 
 
