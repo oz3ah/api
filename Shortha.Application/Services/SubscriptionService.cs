@@ -1,4 +1,5 @@
-﻿using Shortha.Application.Exceptions;
+﻿using Shortha.Application.Dto.Responses.Subscription;
+using Shortha.Application.Exceptions;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Enums;
 using Shortha.Domain.Interfaces;
@@ -8,9 +9,9 @@ namespace Shortha.Application.Services;
 
 public interface ISubscriptionService
 {
-    Task<Subscription> Subscribe(string userId, string planId);
+    Task<SubscriptionCreationResponse> Subscribe(string userId, string planId);
     Task Unsubscribe(string userId);
-    Task<bool> IsSubscribed(string userId);
+    Task<SubscriptionCreationResponse?> IsSubscribed(string userId);
 
     Task<Subscription> UpgradeSubscription(string paymentId, string transactionId, string method,
                                            string currency);
@@ -23,7 +24,7 @@ public class SubscriptionService(
     IUnitOfWork ef)
     : ISubscriptionService
 {
-    public async Task<Subscription> Subscribe(string userId, string planId)
+    public async Task<SubscriptionCreationResponse> Subscribe(string userId, string planId)
     {
         // Start a transaction to ensure atomicity
 
@@ -31,10 +32,11 @@ public class SubscriptionService(
 
         try
         {
+            var Current = await IsSubscribed(userId);
             // Check if the user is already subscribed
-            if (await IsSubscribed(userId))
+            if (Current != null)
             {
-                throw new ConflictException($"User {userId} is already subscribed.");
+                return Current;
             }
 
             var package = await packages.GetPackageDetails(planId);
@@ -54,7 +56,7 @@ public class SubscriptionService(
             await repo.AddAsync(subscription);
             await repo.SaveAsync();
             // Create payment link
-            var paymentLink = payments.GeneratePaymentLink(subscription.Id, package);
+            var paymentLink = payments.GeneratePaymentLink(payment.Id, package);
 
             // Update the payment with the payment link
 
@@ -71,7 +73,17 @@ public class SubscriptionService(
             // Return the created subscription
 
 
-            return subscription;
+            return new SubscriptionCreationResponse()
+            {
+                Id = subscription.Id,
+                StartDate = subscription.StartDate,
+                CreatedAt = subscription.CreatedAt,
+                UpdatedAt = subscription.UpdatedAt,
+                Name = package.Name,
+                Price = package.Price,
+                PaymentLink = paymentLink,
+                Status = payment.Status
+            };
         }
         catch (Exception e)
         {
@@ -81,10 +93,28 @@ public class SubscriptionService(
     }
 
 
-    public async Task<bool> IsSubscribed(string userId)
+    public async Task<SubscriptionCreationResponse?> IsSubscribed(string userId)
     {
-        var subscription = await repo.GetAsync(s => s.UserId == userId && s.IsActive);
-        return subscription != null;
+        var subscription = await repo.GetAsync(s => s.UserId == userId && s.IsActive, includes: new[]
+                                                   {
+                                                       "Payment", "Package"
+                                                   });
+        if (subscription != null)
+        {
+            return new SubscriptionCreationResponse
+            {
+                Id = subscription.Id,
+                StartDate = subscription.StartDate,
+                CreatedAt = subscription.CreatedAt,
+                UpdatedAt = subscription.UpdatedAt,
+                Name = subscription.Package.Name,
+                Price = subscription.Package.Price,
+                PaymentLink = subscription.Payment.PaymentLink,
+                Status = subscription.Payment.Status
+            };
+        }
+
+        return null;
     }
 
     public async Task Unsubscribe(string userId)
@@ -112,6 +142,8 @@ public class SubscriptionService(
                 TransactionId = transactionId,
                 PaymentMethod = method,
                 Currency = currency,
+                Status = PaymentStatus.Completed,
+                PaymentDate = DateTime.UtcNow
             };
 
             var payment = await payments.Update(transactionUpdate, paymentId);
@@ -121,21 +153,26 @@ public class SubscriptionService(
             }
 
             await Unsubscribe(payment.UserId);
-            var newSubscription = new Subscription
-            {
-                UserId = payment.UserId,
-                PackageId = payment.PackageId,
-                PaymentId = payment.Id,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddDays(payment.Package.DurationInDays),
-            };
 
-            await repo.AddAsync(newSubscription);
+            var sub = await repo.GetAsync(s => s.PaymentId == paymentId, includes: ["Package"]);
+            if (sub == null)
+            {
+                throw new NotFoundException("Finding Subscription with the Payment ID Provided is not found");
+            }
+
+
+            sub.PackageId = payment.PackageId;
+            sub.PaymentId = payment.Id;
+            sub.StartDate = DateTime.UtcNow;
+            sub.EndDate = DateTime.UtcNow.AddDays(sub.Package.DurationInDays);
+            sub.Activate();
+
+            repo.Update(sub);
 
             await repo.SaveAsync();
             await ef.CommitAsync();
 
-            return newSubscription;
+            return sub;
         }
         catch
         {

@@ -9,6 +9,11 @@ public class KashierWebhookDto
     [JsonPropertyName("data")] public PaymentDataDto Data { get; set; }
 
     [JsonPropertyName("hash")] public string Hash { get; set; }
+
+    public override string ToString()
+    {
+        return $"Event: {Event}, Data: {Data?.MerchantOrderId}, Hash: {Hash} , A: {Data?.KashierOrderId}";
+    }
 }
 
 public class PaymentDataDto

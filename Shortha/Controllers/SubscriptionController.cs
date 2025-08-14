@@ -15,10 +15,10 @@ public class SubscriptionController(
 {
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> SubscribeToPackage(string packageId)
+    public async Task<IActionResult> SubscribeToPackage([FromBody] SubscribeDto packageDto)
     {
         var userId = User.GetUserId();
-        var result = await subscription.Subscribe(userId, packageId);
+        var result = await subscription.Subscribe(userId, packageDto.packageId);
 
         return Success(result);
     }
@@ -34,6 +34,7 @@ public class SubscriptionController(
 
         if (webhookData.Event != "pay") return Ok(new { message = "Webhook received successfully", webhookData });
 
+        logger.LogInformation("Webhook : {KashierWebhookDto}", webhookData);
 
         var updated = await subscription.UpgradeSubscription(webhookData.Data.MerchantOrderId,
                                                              webhookData.Data.TransactionId,
