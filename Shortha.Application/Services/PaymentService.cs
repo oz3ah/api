@@ -13,6 +13,7 @@ public class PaymentUpdateDto
     public string? PaymentMethod { get; set; }
 
     public string? PaymentLink { get; set; }
+    public DateTime? PaymentDate { get; set; }
 }
 
 public interface IPaymentService
@@ -30,11 +31,11 @@ public class PaymentService(IPaymentRepository repo, IKahsierService kahsier) : 
     public async Task<Payment> Create(Package package, string userId)
     {
         var payment = new Payment
-                      {
-                          UserId = userId,
-                          Amount = package.Price,
-                          PackageId = package.Id,
-                      };
+        {
+            UserId = userId,
+            Amount = package.Price,
+            PackageId = package.Id,
+        };
         await repo.AddAsync(payment);
         await repo.SaveAsync();
         return payment;
@@ -50,17 +51,17 @@ public class PaymentService(IPaymentRepository repo, IKahsierService kahsier) : 
     public async Task<Payment> CreateVoid(string packageId, string userId)
     {
         var payment = new Payment
-                      {
-                          Amount = 0,
-                          Currency = "VOD",
-                          PackageId = packageId,
-                          PaymentMethod = "AUTO",
-                          TransactionId = "-1",
-                          Status = PaymentStatus.Completed,
-                          PaymentDate = DateTime.UtcNow,
-                          ExpirationDate = DateTime.UtcNow,
-                          UserId = userId
-                      };
+        {
+            Amount = 0,
+            Currency = "VOD",
+            PackageId = packageId,
+            PaymentMethod = "AUTO",
+            TransactionId = "-1",
+            Status = PaymentStatus.Completed,
+            PaymentDate = DateTime.UtcNow,
+            ExpirationDate = DateTime.UtcNow,
+            UserId = userId
+        };
 
         await repo.AddAsync(payment);
         await repo.SaveAsync();
@@ -104,6 +105,16 @@ public class PaymentService(IPaymentRepository repo, IKahsierService kahsier) : 
         if (!string.IsNullOrEmpty(paymentUpdateDto.PaymentLink))
         {
             payment.PaymentLink = paymentUpdateDto.PaymentLink;
+        }
+
+        if (paymentUpdateDto.PaymentDate.HasValue)
+        {
+            payment.PaymentDate = paymentUpdateDto.PaymentDate.Value;
+        }
+
+        if (paymentUpdateDto.Status.HasValue)
+        {
+            payment.Status = paymentUpdateDto.Status.Value;
         }
 
         repo.Update(payment);

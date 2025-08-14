@@ -8,7 +8,7 @@ namespace Shortha.Domain.Entites
         public bool IsDeleted { get; set; } = false;
         public string UserId { get; init; } = null!;
         public virtual AppUser User { get; init; } = null!;
-        public DateTime? PaymentDate { get; init; }
+        public DateTime? PaymentDate { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public string? PaymentLink { get; set; }
