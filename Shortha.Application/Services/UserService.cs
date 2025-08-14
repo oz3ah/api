@@ -67,4 +67,15 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
     {
         await auth0.AssignRoleToUser(newRole, userId);
     }
+
+    public async Task<bool> IsUserPremium(string userId)
+    {
+        var user = await repository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            throw new NotFoundException("User not found");
+        }
+
+        return user.IsPremium;
+    }
 }

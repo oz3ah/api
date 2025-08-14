@@ -9,4 +9,5 @@ public interface IUserService
     Task<(AppUser, UserUrlStatsResponse)> GetUserById(string userId);
     Task<AppUser> ChangeSubscriptionType(string userId, bool isPremium);
     Task AlternateUserRole(string newRole, string userId);
+    Task<bool> IsUserPremium(string userId);
 }

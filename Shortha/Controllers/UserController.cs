@@ -37,5 +37,14 @@ namespace Shortha.Controllers
                 stats = user.Item2
             });
         }
+
+        [Authorize]
+        [HttpGet("subscription-status")]
+        public async Task<IActionResult> GetSubscriptionStatus()
+        {
+            var userId = User.GetUserId();
+            var status = await userService.IsUserPremium(userId);
+            return Success(status);
+        }
     }
 }
