@@ -29,7 +29,7 @@ public class SubscriptionController(
         if (webhookData == null)
         {
             logger.LogError("Received null webhook data.");
-            return BadRequest(new { message = "Invalid webhook data" });
+            return Fail("No Webhook Data");
         }
 
         if (webhookData.Event != "pay") return Ok(new { message = "Webhook received successfully", webhookData });
@@ -43,6 +43,6 @@ public class SubscriptionController(
         await userService.ChangeSubscriptionType(updated.UserId, true);
         await userService.AlternateUserRole("Pro", updated.UserId);
 
-        return Ok(new { message = "Webhook received successfully", webhookData });
+        return Success("Done");
     }
 }

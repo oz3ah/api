@@ -4,7 +4,7 @@ namespace Shortha.Application.Dto.Responses.Subscription
 {
     public class SubscriptionCreationResponse
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public required string Id { get; set; }
 
         public DateTime StartDate { get; init; }
         public DateTime CreatedAt { get; set; }
