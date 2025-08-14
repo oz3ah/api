@@ -42,7 +42,6 @@ namespace Shortha
             builder.Services.AddDocs();
 
             var app = builder.Build();
-            app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseCors();
@@ -68,7 +67,7 @@ namespace Shortha
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                 Seeder.SeedPackagesAsync(services).Wait();
+                Seeder.SeedPackagesAsync(services).Wait();
             }
 
             // Configure the HTTP request pipeline.
