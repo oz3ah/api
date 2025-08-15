@@ -71,7 +71,7 @@ public class PaymentService(IPaymentRepository repo, IKahsierService kahsier) : 
     public async Task<Payment?> GetPendingByUser(string userId)
     {
         var payment = await repo.GetAsync(u => u.UserId == userId && u.Status == PaymentStatus.Pending);
-        return payment;
+        return payment is { IsExpired: false } ? payment : null;
     }
 
     public async Task<Payment> Update(PaymentUpdateDto paymentUpdateDto, string paymentId)
