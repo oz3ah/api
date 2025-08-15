@@ -13,7 +13,7 @@ namespace Shortha.Domain.Entites
 
         public string? PaymentLink { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public DateTime ExpirationDate { get; init; } = DateTime.UtcNow.AddHours(1);
+        public DateTime ExpirationDate { get; init; } = DateTime.UtcNow.AddMinutes(10);
         public decimal Amount { get; init; }
         public string Currency { get; set; } = "USD";
         public string? PaymentMethod { get; set; }
