@@ -47,8 +47,8 @@ public class KahsierService(ISecretService secretService) : IKahsierService
         var queryString = query.ToString();
 
         // Append the URLs manually
-        queryString += $"&merchantRedirect=https://shortha.vercel.app/upgraded?orderId={subscriptionId}";
-        queryString += "&serverWebhook=https://s8c7sgkb-7019.euw.devtunnels.ms/api/Subscription/payment";
+        queryString += $"&merchantRedirect=https://shortha.vercel.app/upgrade";
+        queryString += "&serverWebhook=https://shortha.gitnasr.com/api/Subscription/payment";
 
         var uri = $"https://payments.kashier.io/?{queryString}";
 
