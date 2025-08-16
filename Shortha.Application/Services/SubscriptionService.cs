@@ -109,14 +109,12 @@ public class SubscriptionService(
     public async Task Unsubscribe(string userId)
     {
         var subscription = await repo.GetAsync(s => s.UserId == userId && s.IsActive);
-        if (subscription == null)
+        if (subscription is not null)
         {
-            throw new NotFoundException($"Subscription for user {userId} not found.");
+            subscription.Deactivate();
+            repo.Update(subscription);
+            await repo.SaveAsync();
         }
-
-        subscription.Deactivate();
-        repo.Update(subscription);
-        await repo.SaveAsync();
     }
 
     public async Task<Subscription> UpgradeSubscription(string paymentHash, string transactionId, string method,
