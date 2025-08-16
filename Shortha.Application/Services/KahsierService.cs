@@ -36,7 +36,7 @@ public class KahsierService(ISecretService secretService) : IKahsierService
         query["merchantId"] = _mid;
         query["orderId"] = paymentHash;
         query["amount"] = package.Price.ToString();
-        query["currency"] = "USD";
+        query["currency"] = "EGP";
         query["hash"] = CreateHash(package.Price, paymentHash);
         query["mode"] = "test";
         query["interactionSource"] = "Ecommerce";
