@@ -205,6 +205,10 @@ namespace Shortha.Infrastructre.Migrations
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("PaymentHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PaymentLink")
                         .HasColumnType("text");
 
@@ -258,6 +262,9 @@ namespace Shortha.Infrastructre.Migrations
                         .HasDefaultValue(true);
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPending")
                         .HasColumnType("boolean");
 
                     b.Property<string>("PackageId")
