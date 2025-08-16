@@ -29,6 +29,9 @@ namespace Shortha.Domain.Entites
         public string? CreatedBy { get; set; } = "system";
         public string? UpdatedBy { get; set; } = "system";
 
+        public string? ApiKey { get; set; }
+        public virtual Api? Api { get; set; }
+
         public void IncrementClick() => ClickCount++;
         public void Deactivate() => IsActive = false;
         public void Activate() => IsActive = true;

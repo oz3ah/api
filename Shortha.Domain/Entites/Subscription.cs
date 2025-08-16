@@ -1,6 +1,4 @@
-﻿using Shortha.Domain.Enums;
-
-namespace Shortha.Domain.Entites
+﻿namespace Shortha.Domain.Entites
 {
     public class Subscription : IBase
     {

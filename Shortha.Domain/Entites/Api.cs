@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Shortha.Domain.Entites
+﻿namespace Shortha.Domain.Entites
 {
     public class Api : IBase
     {
@@ -24,5 +18,7 @@ namespace Shortha.Domain.Entites
         public bool IsExpired => ExpiresAt.HasValue && DateTime.UtcNow > ExpiresAt.Value;
         public void Deactivate() => IsActive = false;
         public void Activate() => IsActive = true;
+
+        public virtual List<Url> Urls { get; set; } = new List<Url>();
     }
 }

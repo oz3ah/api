@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Shortha.Domain.Entites;
-using Shortha.Domain.Enums;
 using Shortha.Domain.Interfaces;
 using Shortha.Infrastructre.Audit;
 
@@ -39,15 +37,14 @@ namespace Shortha.Infrastructre
         private List<AuditTrail> HandleAuditingBeforeSaveChanges(string? userId)
         {
             var auditableEntries = ChangeTracker.Entries<IBase>()
-                                                .Where(x => x.State is EntityState.Added or EntityState.Deleted
-                                                           or EntityState.Modified)
-                                                .Select(x => AuditConfig.CreateTrailEntry(userId, x))
-                                                .ToList();
+                .Where(x => x.State is EntityState.Added or EntityState.Deleted
+                    or EntityState.Modified)
+                .Select(x => AuditConfig.CreateTrailEntry(userId, x))
+                .ToList();
 
             return auditableEntries;
         }
 
-      
 
         /// <summary>
         /// Sets auditable properties for entities that are inherited from <see cref="IAuditableEntity"/>

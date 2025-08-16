@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Shortha.Application.AutoMapper;
 using Shortha.Application.Dto.Responses.Package;
 using Shortha.Application.Exceptions;
 using Shortha.Domain.Dto;
@@ -112,12 +111,10 @@ public class PackagesService(IPackageRepository repo, IMapper mapper) : IPackage
 
     public async Task<PaginationResult<PackageInfoDto>> GetActivePackages()
     {
-        var packages = await repo.GetAsync(p => p.IsActive,1,10, p => p.CreatedAt, false);
-        
+        var packages = await repo.GetAsync(p => p.IsActive, 1, 10, p => p.CreatedAt, false);
+
         var mapped = mapper.Map<PaginationResult<PackageInfoDto>>(packages);
 
         return mapped;
-
-
     }
 }

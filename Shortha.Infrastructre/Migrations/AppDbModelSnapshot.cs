@@ -23,6 +23,59 @@ namespace Shortha.Infrastructre.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Shortha.Domain.Entites.Api", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime?>("LastUsed")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Api");
+                });
+
             modelBuilder.Entity("Shortha.Domain.Entites.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -305,6 +358,9 @@ namespace Shortha.Infrastructre.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("text");
+
                     b.Property<int>("ClickCount")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -315,6 +371,9 @@ namespace Shortha.Infrastructre.Migrations
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
+
+                    b.Property<int>("CreationSource")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("timestamp without time zone");
@@ -348,6 +407,8 @@ namespace Shortha.Infrastructre.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApiKey");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Urls");
@@ -356,6 +417,9 @@ namespace Shortha.Infrastructre.Migrations
             modelBuilder.Entity("Shortha.Domain.Entites.Visit", b =>
                 {
                     b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AppUserId")
                         .HasColumnType("text");
 
                     b.Property<string>("Browser")
@@ -428,9 +492,22 @@ namespace Shortha.Infrastructre.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AppUserId");
+
                     b.HasIndex("UrlId");
 
                     b.ToTable("Visits");
+                });
+
+            modelBuilder.Entity("Shortha.Domain.Entites.Api", b =>
+                {
+                    b.HasOne("Shortha.Domain.Entites.AppUser", "User")
+                        .WithMany("Apis")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Shortha.Domain.Entites.AuditTrail", b =>
@@ -491,16 +568,27 @@ namespace Shortha.Infrastructre.Migrations
 
             modelBuilder.Entity("Shortha.Domain.Entites.Url", b =>
                 {
+                    b.HasOne("Shortha.Domain.Entites.Api", "Api")
+                        .WithMany("Urls")
+                        .HasForeignKey("ApiKey")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("Shortha.Domain.Entites.AppUser", "User")
                         .WithMany("Urls")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Api");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Shortha.Domain.Entites.Visit", b =>
                 {
+                    b.HasOne("Shortha.Domain.Entites.AppUser", null)
+                        .WithMany("Visits")
+                        .HasForeignKey("AppUserId");
+
                     b.HasOne("Shortha.Domain.Entites.Url", "Url")
                         .WithMany("Visits")
                         .HasForeignKey("UrlId")
@@ -510,13 +598,22 @@ namespace Shortha.Infrastructre.Migrations
                     b.Navigation("Url");
                 });
 
+            modelBuilder.Entity("Shortha.Domain.Entites.Api", b =>
+                {
+                    b.Navigation("Urls");
+                });
+
             modelBuilder.Entity("Shortha.Domain.Entites.AppUser", b =>
                 {
+                    b.Navigation("Apis");
+
                     b.Navigation("Payments");
 
                     b.Navigation("Subscriptions");
 
                     b.Navigation("Urls");
+
+                    b.Navigation("Visits");
                 });
 
             modelBuilder.Entity("Shortha.Domain.Entites.Package", b =>
