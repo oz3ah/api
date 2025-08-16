@@ -36,7 +36,7 @@ public class KahsierService(ISecretService secretService) : IKahsierService
         query["merchantId"] = _mid;
         query["orderId"] = paymentHash;
         query["amount"] = package.Price.ToString();
-        query["currency"] = "EGP";
+        query["currency"] = "USD";
         query["hash"] = CreateHash(package.Price, paymentHash);
         query["mode"] = "test";
         query["interactionSource"] = "Ecommerce";
@@ -47,10 +47,10 @@ public class KahsierService(ISecretService secretService) : IKahsierService
         var queryString = query.ToString();
 
         // Append the URLs manually
-        queryString += $"&merchantRedirect=https://shortha.vercel.app/upgrade";
+        queryString += $"&merchantRedirect={secretService.GetSecret("PaymentCallbackURL")}";
         queryString += "&serverWebhook=https://shortha.gitnasr.com/api/Subscription/payment";
 
-        var uri = $"https://payments.kashier.io/?{queryString}";
+        var uri = $"{BaseUrl}?{queryString}";
 
 
         return uri;
