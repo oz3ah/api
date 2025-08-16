@@ -17,6 +17,8 @@
         public string UpdatedBy { get; set; } = "system";
 
         public string Provider { get; set; } = null!;
+        public virtual ICollection<Visit> Visits { get; set; } = new HashSet<Visit>();
+        public virtual ICollection<Api> Apis { get; set; } = new List<Api>();
 
         public virtual ICollection<Url> Urls { get; set; } = new List<Url>();
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();

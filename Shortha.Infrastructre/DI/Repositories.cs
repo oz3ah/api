@@ -17,6 +17,7 @@ public static class Repositories
 
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IApiRepository, ApiRepository>();
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
         return services;
