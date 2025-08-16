@@ -1,4 +1,6 @@
-﻿namespace Shortha.Domain.Entites
+﻿using Shortha.Domain.Enums;
+
+namespace Shortha.Domain.Entites
 {
     public class Url : IBase
     {
@@ -14,6 +16,7 @@
 
         public string? UserId { get; set; }
         public virtual AppUser? User { get; init; }
+        public UrlCreationSource CreationSource { get; set; }
 
         public virtual ICollection<Visit> Visits { get; set; } = new HashSet<Visit>();
 
@@ -27,7 +30,6 @@
         public string? UpdatedBy { get; set; } = "system";
 
         public void IncrementClick() => ClickCount++;
-        public void MarkAsUpdated() => UpdatedAt = DateTime.UtcNow;
         public void Deactivate() => IsActive = false;
         public void Activate() => IsActive = true;
     }

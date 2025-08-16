@@ -1,10 +1,11 @@
-﻿namespace Shortha.Domain.Entites
+﻿using Shortha.Domain.Enums;
+
+namespace Shortha.Domain.Entites
 {
     public class Subscription : IBase
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public bool IsDeleted { get; set; } = false;
-
 
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
         public DateTime EndDate { get; set; }
