@@ -1,4 +1,5 @@
-﻿using Shortha.Application.Exceptions;
+﻿using System.Security.Cryptography;
+using Shortha.Application.Exceptions;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Enums;
 using Shortha.Domain.Interfaces.Repositories;
@@ -28,17 +29,29 @@ public interface IPaymentService
 
 public class PaymentService(IPaymentRepository repo, IKahsierService kahsier) : IPaymentService
 {
+    private string GeneratePaymentHash(string userId, string packageId, decimal price)
+    {
+        var prime1 = Crypto.GetRandomPrime();
+        var prime2 = Crypto.GetRandomPrime();
+        long primeProduct = prime1 * prime2;
+
+        var raw = $"{userId}.{packageId}.{price}.{primeProduct}.gitnasr";
+        return Crypto.GenerateSHA265FromRaw(raw);
+    }
+
     public async Task<Payment> Create(Package package, string userId)
     {
-        var paymentHash = $"{userId}_{package.Price * 3}_{DateTime.UtcNow.Nanosecond}_gitnasr_payment_system";
-        var paymentLink = kahsier.Url(paymentHash, package);
+        var hash = GeneratePaymentHash(userId, package.Id, package.Price);
+
+
+        var paymentLink = kahsier.Url(hash, package);
         var payment = new Payment
         {
             UserId = userId,
             Amount = package.Price,
             PackageId = package.Id,
             PaymentLink = paymentLink,
-            PaymentHash = paymentHash
+            PaymentHash = hash
         };
         await repo.AddAsync(payment);
         await repo.SaveAsync();
