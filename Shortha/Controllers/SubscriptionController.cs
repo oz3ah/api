@@ -32,13 +32,13 @@ public class SubscriptionController(
             return Fail("No Webhook Data");
         }
 
-        if (webhookData.Event != "pay") return Ok(new { message = "Webhook received successfully", webhookData });
+        if (webhookData.Event != "pay") return Success("Nevermind");
 
         logger.LogInformation("Webhook : {KashierWebhookDto}", webhookData);
 
         var updated = await subscription.UpgradeSubscription(webhookData.Data.MerchantOrderId,
-                                                             webhookData.Data.TransactionId,
-                                                             webhookData.Data.Method, webhookData.Data.Currency);
+            webhookData.Data.TransactionId,
+            webhookData.Data.Method, webhookData.Data.Currency);
 
         await userService.ChangeSubscriptionType(updated.UserId, true);
         await userService.AlternateUserRole("Pro", updated.UserId);

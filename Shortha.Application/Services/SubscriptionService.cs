@@ -1,4 +1,5 @@
-﻿using Shortha.Application.Dto.Responses.Subscription;
+﻿using AutoMapper;
+using Shortha.Application.Dto.Responses.Subscription;
 using Shortha.Application.Exceptions;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Enums;
@@ -10,17 +11,21 @@ namespace Shortha.Application.Services;
 public interface ISubscriptionService
 {
     Task<SubscriptionCreationResponse> Subscribe(string userId, string planId);
+    Task<Subscription?> Get(string userId);
     Task Unsubscribe(string userId);
     Task<SubscriptionCreationResponse?> IsSubscribed(string userId);
 
-    Task<Subscription> UpgradeSubscription(string paymentId, string transactionId, string method,
-                                           string currency);
+    Task<Subscription> UpgradeSubscription(string paymentHash, string transactionId, string method,
+        string currency);
+
+    Task<Subscription> Update(Subscription updatedSubscription);
 }
 
 public class SubscriptionService(
     ISubscriptionRepository repo,
     IPackagesService packages,
     IPaymentService payments,
+    IMapper mapper,
     IUnitOfWork ef)
     : ISubscriptionService
 {
@@ -32,11 +37,15 @@ public class SubscriptionService(
 
         try
         {
-            var Current = await IsSubscribed(userId);
-            // Check if the user is already subscribed
-            if (Current != null)
+            var Current = await Get(userId);
+
+            // Check if has pending subscription, pending subscription means the user has not completed the payment yet
+            var pendingPayment = await payments.GetPendingByUser(userId);
+
+
+            if (pendingPayment is not null && Current is not null && Current.IsPending)
             {
-                return Current;
+                return mapper.Map<SubscriptionCreationResponse>(Current);
             }
 
             var package = await packages.GetPackageDetails(planId);
@@ -44,6 +53,17 @@ public class SubscriptionService(
             {
                 throw new NoPermissionException("Free package does not require a subscription.");
             }
+
+            if (pendingPayment is null && Current is not { IsActive: true })
+            {
+                // Regeratate Payment Link
+                var updatedPayment = await payments.Create(package, userId);
+                Current.PaymentId = updatedPayment.Id;
+                await Update(Current);
+
+                return mapper.Map<SubscriptionCreationResponse>(Current);
+            }
+
 
             var payment = await payments.Create(package, userId);
 
@@ -55,35 +75,10 @@ public class SubscriptionService(
             };
             await repo.AddAsync(subscription);
             await repo.SaveAsync();
-            // Create payment link
-            var paymentLink = payments.GeneratePaymentLink(payment.Id, package);
-
-            // Update the payment with the payment link
-
-            var payload = new PaymentUpdateDto
-            {
-                PaymentLink = paymentLink
-            };
-
-            await payments.Update(payload, payment.Id);
-            await repo.SaveAsync();
 
             // Commit the transaction
             await ef.CommitAsync();
-            // Return the created subscription
-
-
-            return new SubscriptionCreationResponse()
-            {
-                Id = subscription.Id,
-                StartDate = subscription.StartDate,
-                CreatedAt = subscription.CreatedAt,
-                UpdatedAt = subscription.UpdatedAt,
-                Name = package.Name,
-                Price = package.Price,
-                PaymentLink = paymentLink,
-                Status = payment.Status
-            };
+            return mapper.Map<SubscriptionCreationResponse>(Current);
         }
         catch (Exception e)
         {
@@ -92,30 +87,24 @@ public class SubscriptionService(
         }
     }
 
+    public async Task<Subscription?> Get(string userId)
+    {
+        return await repo.GetAsync(s => s.UserId == userId, includes: new[]
+        {
+            "Payment", "Package"
+        });
+    }
+
 
     public async Task<SubscriptionCreationResponse?> IsSubscribed(string userId)
     {
-        var subscription = await repo.GetAsync(s => s.UserId == userId && s.IsActive, includes: new[]
-                                                   {
-                                                       "Payment", "Package"
-                                                   });
-        if (subscription != null)
-        {
-            return new SubscriptionCreationResponse
-            {
-                Id = subscription.Id,
-                StartDate = subscription.StartDate,
-                CreatedAt = subscription.CreatedAt,
-                UpdatedAt = subscription.UpdatedAt,
-                Name = subscription.Package.Name,
-                Price = subscription.Package.Price,
-                PaymentLink = subscription.Payment.PaymentLink,
-                Status = subscription.Payment.Status
-            };
-        }
+        var subscription = await repo.GetAsync(
+            s => s.UserId == userId && s.IsActive,
+            includes: ["Payment", "Package"]);
 
-        return null;
+        return subscription is null ? null : mapper.Map<SubscriptionCreationResponse>(subscription);
     }
+
 
     public async Task Unsubscribe(string userId)
     {
@@ -130,31 +119,26 @@ public class SubscriptionService(
         await repo.SaveAsync();
     }
 
-    public async Task<Subscription> UpgradeSubscription(string paymentId, string transactionId, string method,
-                                                        string currency)
+    public async Task<Subscription> UpgradeSubscription(string paymentHash, string transactionId, string method,
+        string currency)
     {
         await ef.BeginTransactionAsync();
 
+
         try
         {
-            var transactionUpdate = new PaymentUpdateDto()
-            {
-                TransactionId = transactionId,
-                PaymentMethod = method,
-                Currency = currency,
-                Status = PaymentStatus.Completed,
-                PaymentDate = DateTime.UtcNow
-            };
+            var payment = await payments.GetPaymentByHash(paymentHash);
+            payment.TransactionId = transactionId;
+            payment.PaymentMethod = method;
+            payment.Currency = currency;
+            payment.Status = PaymentStatus.Completed;
+            payment.PaymentDate = DateTime.UtcNow;
 
-            var payment = await payments.Update(transactionUpdate, paymentId);
-            if (payment == null)
-            {
-                throw new UpdateFailedException("Failed to update payment.");
-            }
+            payment = await payments.Update(payment);
 
             await Unsubscribe(payment.UserId);
 
-            var sub = await repo.GetAsync(s => s.PaymentId == paymentId, includes: ["Package"]);
+            var sub = await repo.GetAsync(s => s.PaymentId == payment.Id, includes: ["Package"]);
             if (sub == null)
             {
                 throw new NotFoundException("Finding Subscription with the Payment ID Provided is not found");
@@ -179,5 +163,18 @@ public class SubscriptionService(
             await ef.RollbackAsync();
             throw;
         }
+    }
+
+    public async Task<Subscription> Update(Subscription updatedSubscription)
+    {
+        var existingSubscription = await repo.GetByIdAsync(updatedSubscription.Id);
+        if (existingSubscription == null)
+        {
+            throw new NotFoundException($"Subscription with ID {updatedSubscription.Id} does not exist.");
+        }
+
+        repo.Update(updatedSubscription);
+        await repo.SaveAsync();
+        return updatedSubscription;
     }
 }
