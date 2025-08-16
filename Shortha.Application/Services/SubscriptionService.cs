@@ -54,13 +54,13 @@ public class SubscriptionService(
                 throw new NoPermissionException("Free package does not require a subscription.");
             }
 
-            if (pendingPayment is null && Current is not { IsActive: true })
+            if (pendingPayment is null && Current is not null && Current is not { IsActive: true })
             {
                 // Regeratate Payment Link
                 var updatedPayment = await payments.Create(package, userId);
                 Current.PaymentId = updatedPayment.Id;
                 await Update(Current);
-
+                await ef.CommitAsync();
                 return mapper.Map<SubscriptionCreationResponse>(Current);
             }
 
@@ -78,7 +78,7 @@ public class SubscriptionService(
 
             // Commit the transaction
             await ef.CommitAsync();
-            return mapper.Map<SubscriptionCreationResponse>(Current);
+            return mapper.Map<SubscriptionCreationResponse>(subscription);
         }
         catch (Exception e)
         {
