@@ -8,13 +8,14 @@
 
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
         public DateTime EndDate { get; set; }
-        public bool IsActive { get; private set; } = true;
+        public bool IsActive { get; private set; } = false;
+        public bool IsPending { get; private set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
 
         // Navigation properties
-        public virtual Payment Payment { get; set; } = null!; // Assuming a subscription is linked to a payment
+        public virtual Payment Payment { get; set; } = null!;
         public required string PaymentId { get; set; } = null!;
 
         public required string UserId { get; init; }
@@ -29,6 +30,11 @@
         public bool IsExpired => DateTime.UtcNow > EndDate;
         public TimeSpan TimeRemaining => EndDate > DateTime.UtcNow ? EndDate - DateTime.UtcNow : TimeSpan.Zero;
         public void Deactivate() => IsActive = false;
-        public void Activate() => IsActive = true;
+
+        public void Activate()
+        {
+            IsActive = true;
+            IsPending = false;
+        }
     }
 }

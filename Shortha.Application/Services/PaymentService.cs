@@ -22,30 +22,38 @@ public interface IPaymentService
     Task<Payment> Create(Package package, string userId);
     Task<Payment> CreateVoid(string packageId, string userId);
     Task<Payment?> GetPendingByUser(string userId);
-    string GeneratePaymentLink(string subscriptionId, Package package);
-    Task<Payment> Update(PaymentUpdateDto paymentUpdateDto, string paymentId);
+    Task<Payment> Update(Payment updatedPayment);
+    Task<Payment> GetPaymentByHash(string paymentHash);
 }
 
 public class PaymentService(IPaymentRepository repo, IKahsierService kahsier) : IPaymentService
 {
     public async Task<Payment> Create(Package package, string userId)
     {
+        var paymentHash = $"{userId}_{package.Price * 3}_{DateTime.UtcNow.Nanosecond}_gitnasr_payment_system";
+        var paymentLink = kahsier.Url(paymentHash, package);
         var payment = new Payment
         {
             UserId = userId,
             Amount = package.Price,
             PackageId = package.Id,
+            PaymentLink = paymentLink,
+            PaymentHash = paymentHash
         };
         await repo.AddAsync(payment);
         await repo.SaveAsync();
         return payment;
     }
 
-    public string GeneratePaymentLink(string subscriptionId, Package package)
+    public async Task<Payment> GetPaymentByHash(string paymentHash)
     {
-        var paymentLink = kahsier.Url(subscriptionId, package);
+        var payment = await repo.GetAsync(p => p.PaymentHash == paymentHash);
+        if (payment == null)
+        {
+            throw new NotFoundException("Payment not found");
+        }
 
-        return paymentLink;
+        return payment!;
     }
 
     public async Task<Payment> CreateVoid(string packageId, string userId)
@@ -74,51 +82,10 @@ public class PaymentService(IPaymentRepository repo, IKahsierService kahsier) : 
         return payment is { IsExpired: false } ? payment : null;
     }
 
-    public async Task<Payment> Update(PaymentUpdateDto paymentUpdateDto, string paymentId)
+    public async Task<Payment> Update(Payment updatedPayment)
     {
-        var payment = await repo.GetAsync(p => p.Id == paymentId);
-        if (payment == null)
-        {
-            throw new NotFoundException("Payment not found");
-        }
-
-        if (paymentUpdateDto.Status.HasValue)
-        {
-            payment.Status = paymentUpdateDto.Status.Value;
-        }
-
-        if (!string.IsNullOrEmpty(paymentUpdateDto.Currency))
-        {
-            payment.Currency = paymentUpdateDto.Currency;
-        }
-
-        if (!string.IsNullOrEmpty(paymentUpdateDto.TransactionId))
-        {
-            payment.TransactionId = paymentUpdateDto.TransactionId;
-        }
-
-        if (!string.IsNullOrEmpty(paymentUpdateDto.PaymentMethod))
-        {
-            payment.PaymentMethod = paymentUpdateDto.PaymentMethod;
-        }
-
-        if (!string.IsNullOrEmpty(paymentUpdateDto.PaymentLink))
-        {
-            payment.PaymentLink = paymentUpdateDto.PaymentLink;
-        }
-
-        if (paymentUpdateDto.PaymentDate.HasValue)
-        {
-            payment.PaymentDate = paymentUpdateDto.PaymentDate.Value;
-        }
-
-        if (paymentUpdateDto.Status.HasValue)
-        {
-            payment.Status = paymentUpdateDto.Status.Value;
-        }
-
-        repo.Update(payment);
+        repo.Update(updatedPayment);
         await repo.SaveAsync();
-        return payment;
+        return updatedPayment;
     }
 }

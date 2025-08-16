@@ -14,5 +14,6 @@ namespace Shortha.Application.Dto.Responses.Subscription
         public decimal Price { get; set; }
         public string? PaymentLink { get; set; }
         public PaymentStatus Status { get; set; }
+        public bool IsActive { get; set; }
     }
 }

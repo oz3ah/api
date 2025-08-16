@@ -5,6 +5,7 @@ namespace Shortha.Domain.Entites
     public class Payment : IBase
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string PaymentHash { get; set; } = null!;
         public bool IsDeleted { get; set; } = false;
         public string UserId { get; init; } = null!;
         public virtual AppUser User { get; init; } = null!;
@@ -25,5 +26,8 @@ namespace Shortha.Domain.Entites
         public virtual Package Package { get; init; } = null!;
 
         public bool IsExpired => DateTime.UtcNow > ExpirationDate;
+
+        public TimeSpan TimeRemaining =>
+            ExpirationDate > DateTime.UtcNow ? ExpirationDate - DateTime.UtcNow : TimeSpan.Zero;
     }
 }

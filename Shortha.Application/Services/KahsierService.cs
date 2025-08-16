@@ -7,7 +7,7 @@ namespace Shortha.Application.Services;
 
 public interface IKahsierService
 {
-    string Url(string subscriptionId, Package package);
+    string Url(string paymentHash, Package package);
 }
 
 public class KahsierService(ISecretService secretService) : IKahsierService
@@ -29,19 +29,19 @@ public class KahsierService(ISecretService secretService) : IKahsierService
         return BitConverter.ToString(hash).Replace("-", "").ToLower();
     }
 
-    public string Url(string subscriptionId, Package package)
+    public string Url(string paymentHash, Package package)
     {
         var query = HttpUtility.ParseQueryString(string.Empty);
 
         query["merchantId"] = _mid;
-        query["orderId"] = subscriptionId;
+        query["orderId"] = paymentHash;
         query["amount"] = package.Price.ToString();
         query["currency"] = "EGP";
-        query["hash"] = CreateHash(package.Price, subscriptionId);
+        query["hash"] = CreateHash(package.Price, paymentHash);
         query["mode"] = "test";
         query["interactionSource"] = "Ecommerce";
         query["enable3DS"] = "true";
-        query["metaData"] = subscriptionId;
+        query["metaData"] = paymentHash;
 
 
         var queryString = query.ToString();
