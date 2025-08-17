@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using Shortha.Application.Exceptions;
+﻿using Shortha.Application.Exceptions;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Enums;
 using Shortha.Domain.Interfaces.Repositories;
