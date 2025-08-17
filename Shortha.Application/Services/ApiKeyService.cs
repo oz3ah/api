@@ -1,11 +1,13 @@
-﻿using Shortha.Domain.Entites;
+﻿using Shortha.Domain.Dto;
+using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Application.Services
 {
     public interface IApiKeyService
     {
-        Task GenerateApiKeyByUserId(string keyName, string userId, DateTime? expiresAt);
+        Task<Api> GenerateApiKeyByUserId(string keyName, string userId, DateTime? expiresAt);
+        Task<PaginationResult<Api>> GetUserKeys(string userId);
     }
 
     public class ApiKeyService(IApiRepository repo) : IApiKeyService
@@ -24,12 +26,20 @@ namespace Shortha.Application.Services
 
 
             // final format
-            var apiKey = $"ljeryy_{randomPart}_.bygitnasr";
+            var apiKey = $"ljeryy.{randomPart}.bygitnasr";
             return apiKey;
         }
 
-        public async Task GenerateApiKeyByUserId(string keyName, string userId, DateTime? expiresAt)
+        public async Task<Api> GenerateApiKeyByUserId(string keyName, string userId, DateTime? expiresAt)
         {
+            // Cehck if the name is already taken
+            var existingKey = await repo.GetAsync(a => a.Name == keyName && a.UserId == userId);
+            if (existingKey != null)
+            {
+                throw new InvalidOperationException("An API key" +
+                                                    " with this name already exists for this user.");
+            }
+
             var apiKey = new Api
             {
                 Name = keyName,
@@ -40,6 +50,14 @@ namespace Shortha.Application.Services
 
             await repo.AddAsync(apiKey);
             await repo.SaveAsync();
+
+            return apiKey;
+        }
+
+        public async Task<PaginationResult<Api>> GetUserKeys(string userId)
+        {
+            var keys = await repo.GetAsync(a => a.UserId == userId, 1, 10);
+            return keys;
         }
     }
 }
