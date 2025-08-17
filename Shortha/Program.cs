@@ -3,7 +3,6 @@ using Scalar.AspNetCore;
 using Serilog;
 using Shortha.Application.AutoMapper;
 using Shortha.Application.DI;
-using Shortha.Application.Dto.AutoMapper;
 using Shortha.Domain.Dto;
 using Shortha.Domain.Interfaces;
 using Shortha.Extenstions;
