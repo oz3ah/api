@@ -1,4 +1,6 @@
-﻿using Shortha.Domain.Dto;
+﻿using AutoMapper;
+using Shortha.Application.Dto.Responses.Api;
+using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
 
@@ -7,10 +9,10 @@ namespace Shortha.Application.Services
     public interface IApiKeyService
     {
         Task<Api> GenerateApiKeyByUserId(string keyName, string userId, DateTime? expiresAt);
-        Task<PaginationResult<Api>> GetUserKeys(string userId);
+        Task<PaginationResult<ApiKeyResponse>> GetUserKeys(string userId);
     }
 
-    public class ApiKeyService(IApiRepository repo) : IApiKeyService
+    public class ApiKeyService(IApiRepository repo, IMapper mapper) : IApiKeyService
     {
         private string GenerateApiKey()
         {
@@ -54,10 +56,11 @@ namespace Shortha.Application.Services
             return apiKey;
         }
 
-        public async Task<PaginationResult<Api>> GetUserKeys(string userId)
+        public async Task<PaginationResult<ApiKeyResponse>> GetUserKeys(string userId)
         {
             var keys = await repo.GetAsync(a => a.UserId == userId, 1, 10);
-            return keys;
+
+            return mapper.Map<PaginationResult<ApiKeyResponse>>(keys);
         }
     }
 }
