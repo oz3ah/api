@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Shortha.Application.Dto.Responses.Api;
+using Shortha.Application.Exceptions;
 using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
@@ -38,8 +39,8 @@ namespace Shortha.Application.Services
             var existingKey = await repo.GetAsync(a => a.Name == keyName && a.UserId == userId);
             if (existingKey != null)
             {
-                throw new InvalidOperationException("An API key" +
-                                                    " with this name already exists for this user.");
+                throw new ConflictException("An API key" +
+                                            " with this name already exists for this user.");
             }
 
             var apiKey = new Api
