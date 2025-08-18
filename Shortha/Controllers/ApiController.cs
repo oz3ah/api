@@ -25,7 +25,7 @@ namespace Shortha.Controllers
         [Authorize]
         public async Task<IActionResult> GetUserKeys([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await apiKeyService.GetUserKeys(User.GetUserId());
+            var result = await apiKeyService.GetUserKeys(User.GetUserId(), page, pageSize);
             return Success(result);
         }
     }
