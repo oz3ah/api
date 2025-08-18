@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shortha.Application.Dto.Requests.Api;
+using Shortha.Application.Exceptions;
 using Shortha.Application.Services;
 using Shortha.Extenstions;
 
@@ -14,6 +15,15 @@ namespace Shortha.Controllers
         [Authorize]
         public async Task<IActionResult> CreateNewKey([FromBody] CreateApiKeyDto apiKeyDto)
         {
+            var permissions = User.GetPermissions();
+
+            var isPro = permissions.Contains("api:create");
+
+            if (!isPro)
+            {
+                throw new NoPermissionException("You need a Pro Subscription to be able to use api keys");
+            }
+
             var result = await apiKeyService.GenerateApiKeyByUserId(
                 apiKeyDto.KeyName,
                 User.GetUserId(),
