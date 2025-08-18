@@ -9,7 +9,7 @@ namespace Shortha.Application.Services
     public interface IApiKeyService
     {
         Task<Api> GenerateApiKeyByUserId(string keyName, string userId, DateTime? expiresAt);
-        Task<PaginationResult<ApiKeyResponse>> GetUserKeys(string userId);
+        Task<PaginationResult<ApiKeyResponse>> GetUserKeys(string userId, int page, int pageSize);
     }
 
     public class ApiKeyService(IApiRepository repo, IMapper mapper) : IApiKeyService
@@ -56,9 +56,9 @@ namespace Shortha.Application.Services
             return apiKey;
         }
 
-        public async Task<PaginationResult<ApiKeyResponse>> GetUserKeys(string userId)
+        public async Task<PaginationResult<ApiKeyResponse>> GetUserKeys(string userId, int page, int pageSize)
         {
-            var keys = await repo.GetAsync(a => a.UserId == userId, 1, 10);
+            var keys = await repo.GetAsync(a => a.UserId == userId, page, pageSize);
 
             return mapper.Map<PaginationResult<ApiKeyResponse>>(keys);
         }
