@@ -13,6 +13,7 @@ namespace Shortha.Application.Services
         Task<PaginationResult<ApiKeyResponse>> GetUserKeys(string userId, int page, int pageSize);
         Task<Api> GetApiKeyByKeyAsync(string apiKey);
         Task Update(Api api);
+        Task Revoke(string key);
     }
 
     public class ApiKeyService(IApiRepository repo, IMapper mapper) : IApiKeyService
@@ -82,6 +83,18 @@ namespace Shortha.Application.Services
         {
             repo.Update(api);
             await repo.SaveAsync();
+        }
+
+        public async Task Revoke(string keyId)
+        {
+            var apiKey = await repo.GetAsync(a => a.Id == keyId);
+            if (apiKey is not { IsActive: true })
+            {
+                throw new NotFoundException("API key not found or already revoked.");
+            }
+
+            apiKey.Deactivate();
+            await Update(apiKey);
         }
 
         public static bool IsValidApiKey(string candidateApiKey)
