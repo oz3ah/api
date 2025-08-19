@@ -38,5 +38,13 @@ namespace Shortha.Controllers
             var result = await apiKeyService.GetUserKeys(User.GetUserId(), page, pageSize);
             return Success(result);
         }
+
+        [HttpDelete("{keyId}")]
+        [Authorize]
+        public async Task<IActionResult> RevokeKey(string keyId)
+        {
+            await apiKeyService.Revoke(keyId);
+            return Success("API key revoked successfully.");
+        }
     }
 }
