@@ -17,7 +17,21 @@ namespace Shortha.Infrastructre.DI
         public static IServiceCollection AddAuth0(this IServiceCollection services)
         {
             var secretManager = services.BuildServiceProvider().GetRequiredService<ISecretService>();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = "SmartScheme";
+                    options.DefaultChallengeScheme = "SmartScheme";
+                })
+                .AddPolicyScheme("SmartScheme", "JWT or API Key", options =>
+                {
+                    options.ForwardDefaultSelector = context =>
+                    {
+                        if (context.Request.Headers.ContainsKey("X-API-Key".ToLower()))
+                            return "ApiKey";
+
+                        return JwtBearerDefaults.AuthenticationScheme;
+                    };
+                })
                 .AddJwtBearer(options =>
                 {
                     options.Authority = secretManager.GetSecret("Authority");
@@ -30,7 +44,7 @@ namespace Shortha.Infrastructre.DI
                     {
                         OnChallenge = context =>
                         {
-                            context.HandleResponse(); // Prevent default behavior
+                            context.HandleResponse();
                             context.Response.StatusCode =
                                 StatusCodes.Status401Unauthorized;
                             context.Response.ContentType = "application/json";

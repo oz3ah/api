@@ -7,13 +7,25 @@ using Shortha.Application.Interfaces.Services;
 using Shortha.Domain;
 using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
+using Shortha.Domain.Enums;
 using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Application.Services
 {
     public class UrlService(IUrlRepository repo, IMapper mapper, IBackgroundJobService background) : IUrlService
     {
-        public async Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium)
+        private UrlCreationSource MapSource(string cadidateSource)
+        {
+            return cadidateSource switch
+            {
+                "AuthenticationTypes.Federation" => UrlCreationSource.ProfilePage,
+                "ApiKey" => UrlCreationSource.ApiKey,
+                _ => UrlCreationSource.HomePage
+            };
+        }
+
+        public async Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium,
+            string source)
         {
             // Reject premium-only features for free users
             if (!isPremium)
@@ -30,6 +42,7 @@ namespace Shortha.Application.Services
                 OriginalUrl = urlCreate.Url,
                 UserId = userId,
                 ExpiresAt = isPremium ? urlCreate.ExpiresAt : null,
+                CreationSource = MapSource(source)
             };
 
             if (string.IsNullOrWhiteSpace(urlCreate.CustomHash))
@@ -61,7 +74,7 @@ namespace Shortha.Application.Services
         public async Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10)
         {
             var urls = await repo.GetAsync(filter: u => u.UserId == userId, pageSize: pageSize, pageNumber: page,
-                                           orderBy: u => u.CreatedAt, descending: true);
+                orderBy: u => u.CreatedAt, descending: true);
             return mapper.Map<PaginationResult<UrlResponse>>(urls);
         }
 
