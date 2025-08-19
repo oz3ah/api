@@ -18,6 +18,7 @@ namespace Shortha.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             bool isPro = false;
+            var authSource = User.Identity?.AuthenticationType ?? "Unknown";
 
             if (!string.IsNullOrEmpty(userId))
             {
@@ -26,7 +27,7 @@ namespace Shortha.Controllers
                 isPro = permissions.Contains("create:expire") && permissions.Contains("create:custom");
             }
 
-            var url = await urlService.CreateUrl(submittedUrl, userId, isPro);
+            var url = await urlService.CreateUrl(submittedUrl, userId, isPro, authSource);
             return Success(url);
         }
 
