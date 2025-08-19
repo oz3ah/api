@@ -11,6 +11,8 @@ namespace Shortha.Application.Services
     {
         Task<Api> GenerateApiKeyByUserId(string keyName, string userId, DateTime? expiresAt);
         Task<PaginationResult<ApiKeyResponse>> GetUserKeys(string userId, int page, int pageSize);
+        Task<Api> GetApiKeyByKeyAsync(string apiKey);
+        Task Update(Api api);
     }
 
     public class ApiKeyService(IApiRepository repo, IMapper mapper) : IApiKeyService
@@ -62,6 +64,44 @@ namespace Shortha.Application.Services
             var keys = await repo.GetAsync(a => a.UserId == userId, page, pageSize);
 
             return mapper.Map<PaginationResult<ApiKeyResponse>>(keys);
+        }
+
+        public async Task<Api> GetApiKeyByKeyAsync(string apiKey)
+        {
+            var api = await repo.GetAsync(a => a.Key == apiKey, includes: ["User"]);
+            if (api == null)
+            {
+                throw new NotFoundException("API Key not found.");
+            }
+
+
+            return api;
+        }
+
+        public async Task Update(Api api)
+        {
+            repo.Update(api);
+            await repo.SaveAsync();
+        }
+
+        public static bool IsValidApiKey(string candidateApiKey)
+        {
+            //1. Split it by dots
+            var parts = candidateApiKey.Split('.');
+            //2. Check if it has exactly 3 parts
+            if (parts.Length != 3)
+            {
+                return false;
+            }
+
+            //3. Check if the first part is "ljeryy"
+            if (parts[0] != "ljeryy")
+            {
+                return false;
+            }
+
+            //4. Check if the last part is "bygitnasr"
+            return parts[2] == "bygitnasr";
         }
     }
 }
