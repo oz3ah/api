@@ -7,8 +7,8 @@ public static class ClaimsPrincipalExtensions
     public static HashSet<string> GetPermissions(this ClaimsPrincipal user)
     {
         return user?.FindAll("permissions")
-                   ?.Select(p => p.Value)
-                   ?.ToHashSet() ?? new HashSet<string>();
+            ?.Select(p => p.Value)
+            ?.ToHashSet() ?? [];
     }
 
     public static bool HasPermission(this ClaimsPrincipal user, string permission)
