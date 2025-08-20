@@ -62,7 +62,7 @@ namespace Shortha.Application.Services
 
         public async Task<PaginationResult<ApiKeyResponse>> GetUserKeys(string userId, int page, int pageSize)
         {
-            var keys = await repo.GetAsync(a => a.UserId == userId, page, pageSize);
+            var keys = await repo.GetAsync(a => a.UserId == userId, page, pageSize, orderBy: a => a.CreatedAt, true);
 
             return mapper.Map<PaginationResult<ApiKeyResponse>>(keys);
         }
