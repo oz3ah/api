@@ -50,7 +50,7 @@ namespace Shortha
             {
                 opt.Title = "Shortha API";
                 opt.Theme = ScalarTheme.DeepSpace;
-                opt.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Http11);
+                opt.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Curl);
             });
             app.Use(async (context, next) =>
             {

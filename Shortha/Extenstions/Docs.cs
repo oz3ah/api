@@ -19,23 +19,40 @@ public static class Docs
                 Type = SecuritySchemeType.Http,
                 Scheme = "Bearer"
             });
+            options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+            {
+                Description = "API Key needed to access the endpoints. X-API-Key: {key}",
+                Name = "X-API-Key",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey
+            });
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                                           {
-                                               {
-                                                   new OpenApiSecurityScheme
-                                                   {
-                                                       Reference = new OpenApiReference
-                                                                   {
-                                                                       Id = "Bearer",
-                                                                       Type = ReferenceType.SecurityScheme
-                                                                   }
-                                                   },
-                                                   Array.Empty<string>()
-                                               }
-                                           });
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = "Bearer",
+                            Type = ReferenceType.SecurityScheme
+                        }
+                    },
+                    []
+                },
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "ApiKey"
+                        }
+                    },
+                    []
+                }
+            });
         });
 
         return services;
     }
-
 }
