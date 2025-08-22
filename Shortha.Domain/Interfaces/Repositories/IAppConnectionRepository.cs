@@ -2,6 +2,6 @@
 
 namespace Shortha.Domain.Interfaces.Repositories;
 
-public interface IExtensionRepository : IGenericRepository<Extension>
+public interface IAppConnectionRepository : IGenericRepository<AppConnection>
 {
 }

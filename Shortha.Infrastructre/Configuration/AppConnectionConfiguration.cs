@@ -4,9 +4,9 @@ using Shortha.Domain.Entites;
 
 namespace Shortha.Infrastructre.Configuration;
 
-public class ExtensionConfiguration : IEntityTypeConfiguration<Extension>
+public class AppConnectionConfiguration : IEntityTypeConfiguration<AppConnection>
 {
-    public void Configure(EntityTypeBuilder<Extension> builder)
+    public void Configure(EntityTypeBuilder<AppConnection> builder)
     {
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id)
@@ -18,7 +18,7 @@ public class ExtensionConfiguration : IEntityTypeConfiguration<Extension>
         builder.Property(e => e.IsActivated).HasDefaultValue(false);
         builder.Property(e => e.ActivatedAt).HasDefaultValue(null);
         builder.Property(e => e.UserId);
-        builder.Property(e => e.ApiKey)
+        builder.Property(e => e.ConnectKey)
             .HasMaxLength(256)
             .IsRequired(false);
 
