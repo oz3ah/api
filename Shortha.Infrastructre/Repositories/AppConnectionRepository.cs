@@ -4,6 +4,7 @@ using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Infrastructre.Repositories;
 
-public class ExtensionRepository(DbContext context) : GenericRepository<Extension>(context), IExtensionRepository
+public class AppConnectionRepository(DbContext context)
+    : GenericRepository<AppConnection>(context), IAppConnectionRepository
 {
 }
