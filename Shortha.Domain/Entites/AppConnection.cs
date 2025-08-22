@@ -1,4 +1,6 @@
-﻿namespace Shortha.Domain.Entites;
+﻿using Shortha.Domain.Enums;
+
+namespace Shortha.Domain.Entites;
 
 public class AppConnection : IBase
 {
@@ -15,6 +17,7 @@ public class AppConnection : IBase
     public required decimal Version { get; set; }
     public string? ConnectKey { get; set; }
     public required string SecretKey { get; set; }
+    public required ConnectionDevice Device { get; set; }
 
     public AppUser? User { get; set; }
 }

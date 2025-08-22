@@ -17,7 +17,7 @@ internal static class Services
         services.AddScoped<IKahsierService, KahsierService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IApiKeyService, ApiKeyService>();
-        services.AddScoped<IExtensionService, AppConnectionService>();
+        services.AddScoped<IAppConnectionService, AppConnectionService>();
 
 
         return services;

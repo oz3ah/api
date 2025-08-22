@@ -1,11 +1,12 @@
 ﻿using Shortha.Application.Exceptions;
 using Shortha.Application.Interfaces.Services;
 using Shortha.Domain.Entites;
+using Shortha.Domain.Enums;
 using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Application.Services;
 
-public class AppConnectionService(IAppConnectionRepository repo) : IExtensionService
+public class AppConnectionService(IAppConnectionRepository repo) : IAppConnectionService
 {
     private string GeneratePairCode()
     {
@@ -24,14 +25,15 @@ public class AppConnectionService(IAppConnectionRepository repo) : IExtensionSer
             .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
-    public async Task<AppConnection> CreateNewConnection(decimal version)
+    public async Task<AppConnection> CreateNewConnection(decimal version, ConnectionDevice device)
     {
         var pairCode = GeneratePairCode();
         var extenstion = new AppConnection()
         {
             Version = version,
             PairCode = pairCode,
-            SecretKey = GenerateSecretKey(48)
+            SecretKey = GenerateSecretKey(48),
+            Device = device
         };
 
         await repo.AddAsync(extenstion);
