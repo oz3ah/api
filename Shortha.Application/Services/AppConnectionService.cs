@@ -11,32 +11,15 @@ namespace Shortha.Application.Services;
 
 public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper) : IAppConnectionService
 {
-    private string GeneratePairCode()
-    {
-        int length = 6;
-        const string chars = "1234567890";
-        var random = new Random();
-        return new string(Enumerable.Repeat(chars, length)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
-    }
-
-    private string GenerateSecretKey(int length = 32)
-    {
-        const string chars = "123456780-=+!@#$%^&*()_QWERTYUIOP{}ASDFGHJKL:ZXCVBNM<>?";
-        var random = new Random();
-        return new string(Enumerable.Repeat(chars, length)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
-    }
-
     public async Task<CreatedConnectionDto> CreateNewConnection(decimal version, ConnectionDevice device,
         Dictionary<string, object>? deviceMetadata)
     {
-        var pairCode = GeneratePairCode();
+        var pairCode = Crypto.GeneratePairCode();
         var appConnection = new AppConnection()
         {
             Version = version,
             PairCode = pairCode,
-            SecretKey = GenerateSecretKey(48),
+            SecretKey = Crypto.GenerateSecretKey(48),
             Device = device,
             DeviceMetadata = deviceMetadata?.ToDictionary(
                 kvp => kvp.Key,
@@ -58,7 +41,7 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
             throw new NotFoundException("The Pair Code is not valid or already used");
         }
 
-        var apiKey = GeneratePairCode(); //TEMP: UNTIL WE IMPLEMENT A NEW ALGORITHM;
+        var apiKey = Crypto.GenerateApiToken();
         appConnection.Activate();
         appConnection.ActivatedAt = DateTime.UtcNow;
         appConnection.ConnectKey = apiKey;
