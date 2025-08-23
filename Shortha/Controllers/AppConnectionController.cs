@@ -20,7 +20,7 @@ namespace Shortha.Controllers
         }
 
         [Authorize]
-        [HttpPost("{pairCode:regex(^\\d{6}$)}")]
+        [HttpPost("{pairCode}")]
         public async Task<IActionResult> ActivateConnection([FromRoute] string pairCode)
         {
             var userId = User.GetUserId();
