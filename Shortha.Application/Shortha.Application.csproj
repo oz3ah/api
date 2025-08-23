@@ -26,8 +26,4 @@
     <ProjectReference Include="..\Shortha.Domain\Shortha.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Dto\Responses\AppConnection\" />
-  </ItemGroup>
-
 </Project>

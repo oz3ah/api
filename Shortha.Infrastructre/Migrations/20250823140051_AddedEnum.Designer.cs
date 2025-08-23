@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Shortha.Infrastructre;
@@ -12,9 +13,11 @@ using Shortha.Infrastructre;
 namespace Shortha.Infrastructre.Migrations
 {
     [DbContext(typeof(AppDb))]
-    partial class AppDbModelSnapshot : ModelSnapshot
+    [Migration("20250823140051_AddedEnum")]
+    partial class AddedEnum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,9 +98,8 @@ namespace Shortha.Infrastructre.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("Device")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Device")
+                        .HasColumnType("integer");
 
                     b.Property<Dictionary<string, string>>("DeviceMetadata")
                         .HasColumnType("hstore");
