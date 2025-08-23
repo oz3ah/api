@@ -2,6 +2,7 @@
 using Shortha.Application.Dto.Responses.AppConnection;
 using Shortha.Application.Exceptions;
 using Shortha.Application.Interfaces.Services;
+using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Enums;
 using Shortha.Domain.Interfaces.Repositories;
@@ -49,7 +50,7 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
         return mapper.Map<CreatedConnectionDto>(appConnection);
     }
 
-    public async Task<AppConnection?> ActivateConnection(string pairCode, string userId)
+    public async Task<bool> ActivateConnection(string pairCode, string userId)
     {
         var appConnection = await repo.GetAsync(e => e.PairCode == pairCode);
         if (appConnection == null || appConnection.IsValid())
@@ -64,7 +65,8 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
         appConnection.UserId = userId;
         repo.Update(appConnection);
         await repo.SaveAsync();
-        return appConnection;
+
+        return true;
     }
 
     public async Task<AppConnection?> GetByApiKey(string apiKey)
@@ -78,9 +80,9 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
         return connection;
     }
 
-    public async Task RevokeConnection(string apiKey, string userId)
+    public async Task RevokeConnection(string keyId, string userId)
     {
-        var existingConnection = await repo.GetAsync(e => e.ConnectKey == apiKey && e.UserId == userId);
+        var existingConnection = await repo.GetAsync(e => e.Id == keyId && e.UserId == userId);
         if (existingConnection == null || !existingConnection.IsValid())
         {
             throw new NotFoundException("The connection is not valid or already revoked");
@@ -91,9 +93,9 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
         await repo.SaveAsync();
     }
 
-    public async Task<UserConnectionDto> GetAllByUserId(string userId, int page, int pageSize)
+    public async Task<PaginationResult<UserConnectionDto>> GetAllByUserId(string userId, int page, int pageSize)
     {
         var connections = await repo.GetAsync(e => e.UserId == userId, page, pageSize);
-        return mapper.Map<UserConnectionDto>(connections);
+        return mapper.Map<PaginationResult<UserConnectionDto>>(connections);
     }
 }
