@@ -49,21 +49,22 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
         return mapper.Map<CreatedConnectionDto>(appConnection);
     }
 
-    public async Task<AppConnection?> ActivateExtension(string pairCode)
+    public async Task<AppConnection?> ActivateConnection(string pairCode, string userId)
     {
-        var extension = await repo.GetAsync(e => e.PairCode == pairCode);
-        if (extension == null || extension.IsActivated)
+        var appConnection = await repo.GetAsync(e => e.PairCode == pairCode);
+        if (appConnection == null || appConnection.IsActivated)
         {
             throw new NotFoundException("The Pair Code is not valid or already used");
         }
 
         var apiKey = GeneratePairCode(); //TEMP: UNTIL WE IMPLEMENT A NEW ALGORITHM;
-        extension.IsActivated = true;
-        extension.ActivatedAt = DateTime.UtcNow;
-        extension.ConnectKey = apiKey;
-        repo.Update(extension);
+        appConnection.IsActivated = true;
+        appConnection.ActivatedAt = DateTime.UtcNow;
+        appConnection.ConnectKey = apiKey;
+        appConnection.UserId = userId;
+        repo.Update(appConnection);
         await repo.SaveAsync();
-        return extension;
+        return appConnection;
     }
 
     public async Task<AppConnection?> GetByApiKey(string apiKey)
