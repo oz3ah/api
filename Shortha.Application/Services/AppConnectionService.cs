@@ -27,7 +27,8 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
             .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
-    public async Task<CreatedConnectionDto> CreateNewConnection(decimal version, ConnectionDevice device)
+    public async Task<CreatedConnectionDto> CreateNewConnection(decimal version, ConnectionDevice device,
+        Dictionary<string, object>? deviceMetadata)
     {
         var pairCode = GeneratePairCode();
         var appConnection = new AppConnection()
@@ -35,7 +36,11 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
             Version = version,
             PairCode = pairCode,
             SecretKey = GenerateSecretKey(48),
-            Device = device
+            Device = device,
+            DeviceMetadata = deviceMetadata?.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.ToString() ?? string.Empty
+            )
         };
 
         await repo.AddAsync(appConnection);

@@ -18,6 +18,7 @@ public class AppConnection : IBase
     public string? ConnectKey { get; set; }
     public required string SecretKey { get; set; }
     public required ConnectionDevice Device { get; set; }
+    public Dictionary<string, string>? DeviceMetadata { get; set; }
 
     public AppUser? User { get; set; }
 }
