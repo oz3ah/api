@@ -11,4 +11,7 @@ public interface IAppConnectionService
 
     Task<AppConnection?> ActivateConnection(string pairCode, string userId);
     Task<AppConnection?> GetByApiKey(string apiKey);
+
+    Task RevokeConnection(string apiKey, string userId);
+    Task<UserConnectionDto> GetAllByUserId(string userId, int page, int pageSize);
 }

@@ -95,16 +95,12 @@ namespace Shortha.Infrastructre.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<int>("Device")
-                        .HasColumnType("integer");
+                    b.Property<string>("Device")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Dictionary<string, string>>("DeviceMetadata")
                         .HasColumnType("hstore");
-
-                    b.Property<bool>("IsActivated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -113,9 +109,11 @@ namespace Shortha.Infrastructre.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("SecretKey")
+                    b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Pending");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -131,7 +129,8 @@ namespace Shortha.Infrastructre.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "ConnectKey")
+                        .IsUnique();
 
                     b.ToTable("AppConnection");
                 });

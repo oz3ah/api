@@ -52,13 +52,13 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
     public async Task<AppConnection?> ActivateConnection(string pairCode, string userId)
     {
         var appConnection = await repo.GetAsync(e => e.PairCode == pairCode);
-        if (appConnection == null || appConnection.IsActivated)
+        if (appConnection == null || appConnection.IsValid())
         {
             throw new NotFoundException("The Pair Code is not valid or already used");
         }
 
         var apiKey = GeneratePairCode(); //TEMP: UNTIL WE IMPLEMENT A NEW ALGORITHM;
-        appConnection.IsActivated = true;
+        appConnection.Activate();
         appConnection.ActivatedAt = DateTime.UtcNow;
         appConnection.ConnectKey = apiKey;
         appConnection.UserId = userId;
@@ -69,7 +69,31 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
 
     public async Task<AppConnection?> GetByApiKey(string apiKey)
     {
-        var extension = await repo.GetAsync(e => e.ConnectKey == apiKey && e.IsActivated);
-        return extension;
+        var connection = await repo.GetAsync(e => e.ConnectKey == apiKey);
+        if (connection == null || !connection.IsValid())
+        {
+            return null;
+        }
+
+        return connection;
+    }
+
+    public async Task RevokeConnection(string apiKey, string userId)
+    {
+        var existingConnection = await repo.GetAsync(e => e.ConnectKey == apiKey && e.UserId == userId);
+        if (existingConnection == null || !existingConnection.IsValid())
+        {
+            throw new NotFoundException("The connection is not valid or already revoked");
+        }
+
+        existingConnection.Revoke();
+        repo.Update(existingConnection);
+        await repo.SaveAsync();
+    }
+
+    public async Task<UserConnectionDto> GetAllByUserId(string userId, int page, int pageSize)
+    {
+        var connections = await repo.GetAsync(e => e.UserId == userId, page, pageSize);
+        return mapper.Map<UserConnectionDto>(connections);
     }
 }

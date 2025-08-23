@@ -27,5 +27,21 @@ namespace Shortha.Controllers
             var result = await service.ActivateConnection(pairCode.ToString(), userId);
             return Success(result);
         }
+
+        [HttpDelete]
+        [Authorize]
+        public async Task<IActionResult> RevokeConnection([FromQuery] string apiKey)
+        {
+            await service.RevokeConnection(apiKey, User.GetUserId());
+            return Success<string>(null);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAllConnections([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await service.GetAllByUserId(User.GetUserId(), page, pageSize);
+            return Success(result);
+        }
     }
 }

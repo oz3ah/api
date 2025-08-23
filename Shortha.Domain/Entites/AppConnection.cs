@@ -11,14 +11,19 @@ public class AppConnection : IBase
     public string? CreatedBy { get; set; }
     public string? UpdatedBy { get; set; }
     public required string PairCode { get; set; }
-    public bool IsActivated { get; set; } = false;
     public DateTime? ActivatedAt { get; set; } = null;
     public string? UserId { get; set; }
     public required decimal Version { get; set; }
     public string? ConnectKey { get; set; }
-    public required string SecretKey { get; set; }
+    public required string SecretKey { private get; set; }
     public required ConnectionDevice Device { get; set; }
     public Dictionary<string, string>? DeviceMetadata { get; set; }
 
     public AppUser? User { get; set; }
+    public ConnectionStatus Status { get; private set; } = ConnectionStatus.Pending;
+    public void Revoke() => Status = ConnectionStatus.Revoked;
+
+    public void Activate() => Status = ConnectionStatus.Active;
+
+    public bool IsValid() => Status == ConnectionStatus.Active;
 }
