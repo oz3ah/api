@@ -11,6 +11,7 @@ using Shortha.Infrastructre;
 using Shortha.Infrastructre.DI;
 using Shortha.Middleware;
 using Shortha.Providers;
+using Microsoft.AspNetCore.Mvc; // added for ApiBehaviorOptions
 
 namespace Shortha
 {
@@ -22,7 +23,16 @@ namespace Shortha
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                // Add global validation filter to unify validation error format
+                options.Filters.Add<ValidationFilter>();
+            });
+            builder.Services.Configure<ApiBehaviorOptions>(o =>
+            {
+                // Suppress default automatic model state invalid response so we can format via middleware
+                o.SuppressModelStateInvalidFilter = true;
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddAutoMapper(typeof(Default).Assembly);
 
