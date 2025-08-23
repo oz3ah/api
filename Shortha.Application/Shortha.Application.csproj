@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dto\Requests\Package\**" />
+    <EmbeddedResource Remove="Dto\Requests\Package\**" />
+    <None Remove="Dto\Requests\Package\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="DeviceDetector.NET" Version="6.4.6" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />
@@ -21,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dto\Requests\Package\" />
+    <Folder Include="Dto\Responses\AppConnection\" />
   </ItemGroup>
 
 </Project>

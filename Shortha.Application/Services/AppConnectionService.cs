@@ -1,4 +1,6 @@
-﻿using Shortha.Application.Exceptions;
+﻿using AutoMapper;
+using Shortha.Application.Dto.Responses.AppConnection;
+using Shortha.Application.Exceptions;
 using Shortha.Application.Interfaces.Services;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Enums;
@@ -6,7 +8,7 @@ using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Application.Services;
 
-public class AppConnectionService(IAppConnectionRepository repo) : IAppConnectionService
+public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper) : IAppConnectionService
 {
     private string GeneratePairCode()
     {
@@ -25,10 +27,10 @@ public class AppConnectionService(IAppConnectionRepository repo) : IAppConnectio
             .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
-    public async Task<AppConnection> CreateNewConnection(decimal version, ConnectionDevice device)
+    public async Task<CreatedConnectionDto> CreateNewConnection(decimal version, ConnectionDevice device)
     {
         var pairCode = GeneratePairCode();
-        var extenstion = new AppConnection()
+        var appConnection = new AppConnection()
         {
             Version = version,
             PairCode = pairCode,
@@ -36,9 +38,10 @@ public class AppConnectionService(IAppConnectionRepository repo) : IAppConnectio
             Device = device
         };
 
-        await repo.AddAsync(extenstion);
+        await repo.AddAsync(appConnection);
         await repo.SaveAsync();
-        return extenstion;
+
+        return mapper.Map<CreatedConnectionDto>(appConnection);
     }
 
     public async Task<AppConnection?> ActivateExtension(string pairCode)
