@@ -76,6 +76,62 @@ namespace Shortha.Infrastructre.Migrations
                     b.ToTable("Api");
                 });
 
+            modelBuilder.Entity("Shortha.Domain.Entites.AppConnection", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ActivatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("ConnectKey")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Device")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActivated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PairCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SecretKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Version")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AppConnection");
+                });
+
             modelBuilder.Entity("Shortha.Domain.Entites.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -510,6 +566,16 @@ namespace Shortha.Infrastructre.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Shortha.Domain.Entites.AppConnection", b =>
+                {
+                    b.HasOne("Shortha.Domain.Entites.AppUser", "User")
+                        .WithMany("Extensions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Shortha.Domain.Entites.AuditTrail", b =>
                 {
                     b.HasOne("Shortha.Domain.Entites.AppUser", "User")
@@ -606,6 +672,8 @@ namespace Shortha.Infrastructre.Migrations
             modelBuilder.Entity("Shortha.Domain.Entites.AppUser", b =>
                 {
                     b.Navigation("Apis");
+
+                    b.Navigation("Extensions");
 
                     b.Navigation("Payments");
 
