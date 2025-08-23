@@ -1,4 +1,5 @@
 ﻿using Shortha.Application.Dto.Responses.AppConnection;
+using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Enums;
 
@@ -9,9 +10,9 @@ public interface IAppConnectionService
     Task<CreatedConnectionDto> CreateNewConnection(decimal version, ConnectionDevice device,
         Dictionary<string, object>? deviceMetadata);
 
-    Task<AppConnection?> ActivateConnection(string pairCode, string userId);
+    Task<bool> ActivateConnection(string pairCode, string userId);
     Task<AppConnection?> GetByApiKey(string apiKey);
 
-    Task RevokeConnection(string apiKey, string userId);
-    Task<UserConnectionDto> GetAllByUserId(string userId, int page, int pageSize);
+    Task RevokeConnection(string connectionId, string userId);
+    Task<PaginationResult<UserConnectionDto>> GetAllByUserId(string userId, int page, int pageSize);
 }
