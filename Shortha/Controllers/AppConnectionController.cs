@@ -12,7 +12,8 @@ namespace Shortha.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateConnection([FromBody] CreateConnectionDto connectionDto)
         {
-            var result = await service.CreateNewConnection(connectionDto.Version, connectionDto.Device);
+            var result = await service.CreateNewConnection(connectionDto.Version, connectionDto.Device,
+                connectionDto.DeviceMetadata);
             return Success(result);
         }
     }

@@ -21,6 +21,7 @@ namespace Shortha.Infrastructre.Migrations
                 .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "hstore");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Shortha.Domain.Entites.Api", b =>
@@ -96,6 +97,9 @@ namespace Shortha.Infrastructre.Migrations
 
                     b.Property<int>("Device")
                         .HasColumnType("integer");
+
+                    b.Property<Dictionary<string, string>>("DeviceMetadata")
+                        .HasColumnType("hstore");
 
                     b.Property<bool>("IsActivated")
                         .ValueGeneratedOnAdd()
