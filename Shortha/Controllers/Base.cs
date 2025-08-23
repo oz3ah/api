@@ -4,7 +4,7 @@ using Shortha.Domain.Dto;
 namespace Shortha.Controllers;
 
 [ApiController]
-public  abstract class Base : ControllerBase
+public abstract class Base : ControllerBase
 {
     protected IActionResult Success<T>(T data, string? message = null)
         => Ok(ApiResponse<T>.Ok(data, message));
