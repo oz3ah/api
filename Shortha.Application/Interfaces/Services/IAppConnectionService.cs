@@ -9,6 +9,6 @@ public interface IAppConnectionService
     Task<CreatedConnectionDto> CreateNewConnection(decimal version, ConnectionDevice device,
         Dictionary<string, object>? deviceMetadata);
 
-    Task<AppConnection?> ActivateExtension(string pairCode);
+    Task<AppConnection?> ActivateConnection(string pairCode, string userId);
     Task<AppConnection?> GetByApiKey(string apiKey);
 }
