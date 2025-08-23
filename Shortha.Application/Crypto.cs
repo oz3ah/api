@@ -30,5 +30,31 @@ namespace Shortha.Application
                 .Replace("/", "_")
                 .TrimEnd('=');
         }
+
+        public static string GenerateSecretKey(int length = 32)
+        {
+            const string chars = "123456780-=+!@#$%^&*()_QWERTYUIOP{}ASDFGHJKL:ZXCVBNM<>?";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static string GeneratePairCode()
+        {
+            const int length = 6;
+            Span<byte> bytes = stackalloc byte[length];
+            RandomNumberGenerator.Fill(bytes);
+            var chars = new char[length];
+            for (var i = 0; i < length; i++)
+                chars[i] = (char)('0' + (bytes[i] % 10)); // allows leading zeros
+            return new string(chars);
+        }
+
+        public static string GenerateApiToken(int numBytes = 32)
+        {
+            var bytes = new byte[numBytes];
+            RandomNumberGenerator.Fill(bytes);
+            return Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        }
     }
 }

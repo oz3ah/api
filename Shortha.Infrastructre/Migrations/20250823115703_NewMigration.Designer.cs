@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Shortha.Infrastructre;
@@ -12,16 +13,17 @@ using Shortha.Infrastructre;
 namespace Shortha.Infrastructre.Migrations
 {
     [DbContext(typeof(AppDb))]
-    partial class AppDbModelSnapshot : ModelSnapshot
+    [Migration("20250823115703_NewMigration")]
+    partial class NewMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "hstore");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Shortha.Domain.Entites.Api", b =>
@@ -95,12 +97,13 @@ namespace Shortha.Infrastructre.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("Device")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Device")
+                        .HasColumnType("integer");
 
-                    b.Property<Dictionary<string, string>>("DeviceMetadata")
-                        .HasColumnType("hstore");
+                    b.Property<bool>("IsActivated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -109,11 +112,9 @@ namespace Shortha.Infrastructre.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Status")
+                    b.Property<string>("SecretKey")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("Pending");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -129,8 +130,7 @@ namespace Shortha.Infrastructre.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId", "ConnectKey")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("AppConnection");
                 });
