@@ -11,15 +11,16 @@ public class ValidationFilter : IActionFilter
     {
         if (!context.ModelState.IsValid)
         {
-            var errors = context.ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Invalid value." : e.ErrorMessage)
-                .Distinct()
+            var errors = context.ModelState
+                .SelectMany(kvp => kvp.Value.Errors.Select(e =>
+                    $"{kvp.Key}: {(string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Invalid value." : e.ErrorMessage)}"))
                 .ToList();
 
             throw new ValidationException(errors);
         }
     }
 
-    public void OnActionExecuted(ActionExecutedContext context) { }
+    public void OnActionExecuted(ActionExecutedContext context)
+    {
+    }
 }
