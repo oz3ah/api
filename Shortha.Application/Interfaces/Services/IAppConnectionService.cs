@@ -15,4 +15,5 @@ public interface IAppConnectionService
 
     Task RevokeConnection(string connectionId, string userId);
     Task<PaginationResult<UserConnectionDto>> GetAllByUserId(string userId, int page, int pageSize);
+    Task<bool> IsConnectedByPairCode(string pairCode);
 }
