@@ -124,8 +124,9 @@ namespace Shortha.Infrastructre.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Version")
-                        .HasColumnType("numeric");
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
