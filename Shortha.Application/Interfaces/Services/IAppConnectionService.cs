@@ -7,7 +7,7 @@ namespace Shortha.Application.Interfaces.Services;
 
 public interface IAppConnectionService
 {
-    Task<CreatedConnectionDto> CreateNewConnection(decimal version, ConnectionDevice device,
+    Task<CreatedConnectionDto> CreateNewConnection(string version, ConnectionDevice device,
         Dictionary<string, object>? deviceMetadata);
 
     Task<bool> ActivateConnection(string pairCode, string userId);

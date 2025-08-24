@@ -11,7 +11,7 @@ namespace Shortha.Application.Services;
 
 public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper) : IAppConnectionService
 {
-    public async Task<CreatedConnectionDto> CreateNewConnection(decimal version, ConnectionDevice device,
+    public async Task<CreatedConnectionDto> CreateNewConnection(string version, ConnectionDevice device,
         Dictionary<string, object>? deviceMetadata)
     {
         var pairCode = Crypto.GeneratePairCode();
