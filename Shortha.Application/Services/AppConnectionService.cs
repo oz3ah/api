@@ -89,8 +89,9 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
 
         return new ConnectionStatusDto()
         {
-            IsActive = connection.IsValid(),
-            IsRevoked = connection.IsRevoked()
+            IsActive = connection?.IsValid() ?? false,
+            IsRevoked = connection?.IsRevoked() ?? false,
+            IsExist = connection != null
         };
     }
 }
