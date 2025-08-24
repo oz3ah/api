@@ -36,7 +36,7 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
     public async Task<bool> ActivateConnection(string pairCode, string userId)
     {
         var appConnection = await repo.GetAsync(e => e.PairCode == pairCode);
-        if (appConnection == null || appConnection.IsValid() || appConnection)
+        if (appConnection == null || appConnection.IsValid())
         {
             throw new NotFoundException("The Pair Code is not valid or already used");
         }
