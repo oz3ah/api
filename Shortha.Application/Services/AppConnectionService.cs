@@ -82,10 +82,15 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
         return mapper.Map<PaginationResult<UserConnectionDto>>(connections);
     }
 
-    public async Task<bool> IsConnectedByPairCode(string pairCode)
+    public async Task<ConnectionStatusDto> IsConnectedByPairCode(string pairCode)
     {
         var connection = await repo.GetAsync(e => e.PairCode == pairCode);
 
-        return connection != null && connection.IsValid();
+
+        return new ConnectionStatusDto()
+        {
+            IsActive = connection.IsValid(),
+            IsRevoked = connection.IsRevoked()
+        };
     }
 }
