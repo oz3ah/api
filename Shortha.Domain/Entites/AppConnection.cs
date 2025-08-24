@@ -13,7 +13,7 @@ public class AppConnection : IBase
     public required string PairCode { get; set; }
     public DateTime? ActivatedAt { get; set; } = null;
     public string? UserId { get; set; }
-    public required decimal Version { get; set; }
+    public required string Version { get; set; }
     public string? ConnectKey { get; set; }
     public required string SecretKey { private get; set; }
     public required ConnectionDevice Device { get; set; }
