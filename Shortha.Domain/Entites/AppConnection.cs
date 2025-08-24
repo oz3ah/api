@@ -26,4 +26,6 @@ public class AppConnection : IBase
     public void Activate() => Status = ConnectionStatus.Active;
 
     public bool IsValid() => Status == ConnectionStatus.Active && Status != ConnectionStatus.Revoked;
+
+    public bool IsRevoked() => Status == ConnectionStatus.Revoked;
 }
