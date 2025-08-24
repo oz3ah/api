@@ -81,4 +81,11 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
         var connections = await repo.GetAsync(e => e.UserId == userId, page, pageSize);
         return mapper.Map<PaginationResult<UserConnectionDto>>(connections);
     }
+
+    public async Task<bool> IsConnectedByPairCode(string pairCode)
+    {
+        var connection = await repo.GetAsync(e => e.PairCode == pairCode);
+
+        return connection != null && connection.IsValid();
+    }
 }

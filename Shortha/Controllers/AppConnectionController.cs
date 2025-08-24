@@ -43,5 +43,12 @@ namespace Shortha.Controllers
             var result = await service.GetAllByUserId(User.GetUserId(), page, pageSize);
             return Success(result);
         }
+
+        [HttpGet("status/{pairCode}")]
+        public async Task<IActionResult> GetConnectionStatus([FromRoute] string pairCode)
+        {
+            var connection = await service.IsConnectedByPairCode(pairCode);
+            return Success(connection);
+        }
     }
 }
