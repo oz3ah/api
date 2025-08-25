@@ -9,5 +9,5 @@ public class UserConnectionDto
     public string? Device { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public DateTime? ActivatedAt { get; set; }
-    public decimal Version { get; set; }
+    public string Version { get; set; }
 }
