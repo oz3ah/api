@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Shortha.Application.Dto.Requests.Url;
 using Shortha.Application.Dto.Responses.Url;
 using Shortha.Application.Exceptions;
@@ -12,7 +13,11 @@ using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Application.Services
 {
-    public class UrlService(IUrlRepository repo, IMapper mapper, IBackgroundJobService background) : IUrlService
+    public class UrlService(
+        IUrlRepository repo,
+        IMapper mapper,
+        IBackgroundJobService background
+    ) : IUrlService
     {
         private UrlCreationSource MapSource(string cadidateSource)
         {
@@ -24,24 +29,20 @@ namespace Shortha.Application.Services
             };
         }
 
-        public async Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium,
-            string source)
+        public async Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId,
+            HashSet<string> permissions, string source)
         {
-            // Reject premium-only features for free users
-            if (!isPremium)
-            {
-                if (!string.IsNullOrWhiteSpace(urlCreate.CustomHash))
-                    throw new NoPermissionException("Custom URL is only available for premium users.");
+            if (!permissions.Contains("create:custom") && !string.IsNullOrWhiteSpace(urlCreate.CustomHash))
+                throw new NoPermissionException("Custom URL is only available for premium users.");
 
-                if (urlCreate.ExpiresAt.HasValue)
-                    throw new NoPermissionException("Expiration date is only available for premium users.");
-            }
+            if (!permissions.Contains("create:expire") && urlCreate.ExpiresAt.HasValue)
+                throw new NoPermissionException("Expiration date is only available for premium users.");
 
             var url = new Url
             {
                 OriginalUrl = urlCreate.Url,
                 UserId = userId,
-                ExpiresAt = isPremium ? urlCreate.ExpiresAt : null,
+                ExpiresAt = permissions.Contains("create:expire") ? urlCreate.ExpiresAt : null,
                 CreationSource = MapSource(source)
             };
 
