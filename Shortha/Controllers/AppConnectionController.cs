@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shortha.Application.Dto.Requests.AppConnections;
 using Shortha.Application.Interfaces.Services;
+using Shortha.Attributes;
+using Shortha.Domain.Enums;
 using Shortha.Extenstions;
 
 namespace Shortha.Controllers
@@ -21,6 +23,7 @@ namespace Shortha.Controllers
 
         [Authorize]
         [HttpPost("{pairCode}")]
+        [RequiresPermission(PermissionMode.RequireAll, "connection:create")]
         public async Task<IActionResult> ActivateConnection([FromRoute] string pairCode)
         {
             var userId = User.GetUserId();

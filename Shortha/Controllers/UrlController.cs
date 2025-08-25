@@ -5,6 +5,8 @@ using Shortha.Application.Interfaces.Services;
 using Shortha.Extenstions;
 using Shortha.Filters;
 using System.Security.Claims;
+using Shortha.Attributes;
+using Shortha.Domain.Enums;
 
 namespace Shortha.Controllers
 {
@@ -14,20 +16,14 @@ namespace Shortha.Controllers
     {
         [HttpPost("create")]
         [AllowAnonymous]
+        [RequiresPermission(PermissionMode.Optional, "create:expire", "create:custom")]
         public async Task<IActionResult> CreateNew([FromBody] UrlCreateRequest submittedUrl)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            bool isPro = false;
+            var userId = User.GetUserIdOrNull();
+            var userPermissions = User.GetPermissions();
             var authSource = User.Identity?.AuthenticationType ?? "Unknown";
 
-            if (!string.IsNullOrEmpty(userId))
-            {
-                var permissions = User.GetPermissions();
-
-                isPro = permissions.Contains("create:expire") && permissions.Contains("create:custom");
-            }
-
-            var url = await urlService.CreateUrl(submittedUrl, userId, isPro, authSource);
+            var url = await urlService.CreateUrl(submittedUrl, userId, userPermissions, authSource);
             return Success(url);
         }
 

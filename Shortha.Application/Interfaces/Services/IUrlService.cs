@@ -7,7 +7,7 @@ namespace Shortha.Application.Interfaces.Services;
 
 public interface IUrlService
 {
-    Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, bool isPremium, string source);
+    Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId, HashSet<string> permissions, string source);
     Task<PaginationResult<UrlResponse>> GetUrlsByUserId(string userId, int page = 1, int pageSize = 10);
     Task<PublicUrlResponse> OpenUrl(string shortUrl, RequestInfo request);
     Task<UrlResponse> DeactivateUrl(string id, string userId);
