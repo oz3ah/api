@@ -23,17 +23,8 @@ namespace Shortha
 
             // Add services to the container.
 
-            builder.Services.AddControllers(options =>
-            {
-                // Add global validation filter to unify validation error format
-                options.Filters.Add<ValidationFilter>();
-            });
-            builder.Services.Configure<ApiBehaviorOptions>(o =>
-            {
-                // Suppress default automatic model state invalid response so we can format via middleware
-                o.SuppressModelStateInvalidFilter = true;
-            });
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddControllers(options => { options.Filters.Add<ValidationFilter>(); });
+            builder.Services.Configure<ApiBehaviorOptions>(o => { o.SuppressModelStateInvalidFilter = true; });
             builder.Services.AddAutoMapper(typeof(Default).Assembly);
 
             builder.Services.AddSwaggerGen();
@@ -47,13 +38,18 @@ namespace Shortha
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<ICurrentSessionProvider, CurrentSessionProvider>();
 
+
             builder.Host.AddSerilogLogging();
 
             builder.Services.AddDocs();
 
             var app = builder.Build();
 
+            app.UseMiddleware<PerformanceMonitoringMiddleware>();
+
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+
             app.UseCors();
             app.UseSwagger(opt => { opt.RouteTemplate = "openapi/{documentName}.json"; });
             app.MapScalarApiReference(opt =>
@@ -68,7 +64,8 @@ namespace Shortha
 
                 if (context.Response.StatusCode == StatusCodes.Status403Forbidden && !context.Response.HasStarted)
                 {
-                    var error = ErrorResponse.From("Access denied", traceId: context.TraceIdentifier);
+                    var error = ErrorResponse.From("Access denied", traceId: context.TraceIdentifier,
+                        path: context.Request.Path.Value, statusCode: StatusCodes.Status403Forbidden);
                     context.Response.ContentType = "application/json";
                     await context.Response.WriteAsJsonAsync(error);
                 }
@@ -80,14 +77,34 @@ namespace Shortha
                 Seeder.SeedPackagesAsync(services).Wait();
             }
 
-            // Configure the HTTP request pipeline.
             app.UseHangfireDashboard("/dashboard");
             app.UseHttpsRedirection();
-            app.UseSerilogRequestLogging();
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.MessageTemplate =
+                    "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms | CorrelationId: {CorrelationId}";
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+                {
+                    diagnosticContext.Set("CorrelationId", httpContext.TraceIdentifier);
+                    diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+                    diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+                    diagnosticContext.Set("UserAgent", httpContext.Request.Headers["User-Agent"].ToString());
+
+                    if (httpContext.User?.Identity?.IsAuthenticated == true)
+                    {
+                        diagnosticContext.Set("UserId",
+                            httpContext.User.GetUserIdOrNull() ?? "unknown");
+                    }
+                };
+            });
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
+
+            Log.Information("Shortha API starting up | Environment: {Environment} | AppId: {AppId}",
+                builder.Environment.EnvironmentName, Config.AppId);
+
 
             app.Run();
         }
