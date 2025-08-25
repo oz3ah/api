@@ -7,6 +7,7 @@ namespace Shortha.Middleware;
 public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<RequestResponseLoggingMiddleware> logger)
 {
     private const int MaxLogBodyChars = 100_000; // ~100 KB
+    private const int MaxResponseLogBytes = 64 * 1024; // 64 KB cap for response logging
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -74,7 +75,7 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
 
         try
         {
-            var responseBody = await ReadResponseBodyAsync(responseBodyStream);
+            var responseBody = await ReadResponseBodyAsync(responseBodyStream, response.ContentType);
             var sanitizedHeaders = SanitizeHeaders(response.Headers);
 
             var logLevel = response.StatusCode >= 400 ? LogLevel.Warning : LogLevel.Information;
@@ -115,17 +116,37 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
         return content;
     }
 
-    private async Task<string> ReadResponseBodyAsync(MemoryStream responseBodyStream)
+    private async Task<string> ReadResponseBodyAsync(MemoryStream responseBodyStream, string? contentType)
     {
-        if (responseBodyStream.Length == 0)
-            return string.Empty;
+        try
+        {
+            if (responseBodyStream.Length == 0)
+                return string.Empty;
 
-        responseBodyStream.Seek(0, SeekOrigin.Begin);
-        using var reader = new StreamReader(responseBodyStream, Encoding.UTF8, leaveOpen: true);
-        var content = await reader.ReadToEndAsync();
-        responseBodyStream.Seek(0, SeekOrigin.Begin);
+            if (!IsTextContentType(contentType))
+                return "[binary content omitted]";
 
-        return content;
+            responseBodyStream.Seek(0, SeekOrigin.Begin);
+
+            var bytesToRead = (int)Math.Min(responseBodyStream.Length, MaxResponseLogBytes);
+            var buffer = new byte[bytesToRead];
+            var read = await responseBodyStream.ReadAsync(buffer.AsMemory(0, bytesToRead));
+
+            responseBodyStream.Seek(0, SeekOrigin.Begin);
+
+            var encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
+            var text = encoding.GetString(buffer, 0, read);
+
+            if (responseBodyStream.Length > MaxResponseLogBytes)
+                text += "...[truncated]";
+
+            return text;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to read response body for logging");
+            return "[failed to read response body]";
+        }
     }
 
     private string SanitizeRequestBody(string body)
