@@ -32,78 +32,83 @@ public class ExceptionHandlingMiddleware(
             {
                 case NotFoundException:
                     statusCode = (int)HttpStatusCode.NotFound;
-                    error = ErrorResponse.From(ex.Message, traceId: context.TraceIdentifier);
+                    error = ErrorResponse.From(ex.Message, traceId: context.TraceIdentifier,
+                        path: context.Request.Path.Value, statusCode: statusCode);
                     logger.LogError(ex,
-                                    "NotFoundException occurred | CorrelationId: {CorrelationId} | " +
-                                    "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
-                                    "RequestBody: {RequestBody} | Headers: {@Headers} | " +
-                                    "Message: {Message}",
-                                    errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
-                                    errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
-                                    ex.Message);
+                        "NotFoundException occurred | CorrelationId: {CorrelationId} | " +
+                        "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
+                        "RequestBody: {RequestBody} | Headers: {@Headers} | " +
+                        "Message: {Message}",
+                        errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
+                        errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
+                        ex.Message);
                     break;
 
                 case ValidationException validationEx:
                     statusCode = (int)HttpStatusCode.BadRequest;
-                    error = ErrorResponse.From(validationEx.Message, validationEx.Errors, context.TraceIdentifier);
+                    error = ErrorResponse.From(validationEx.Message, validationEx.Errors, context.TraceIdentifier,
+                        context.Request.Path.Value, statusCode);
                     logger.LogError(ex,
-                                    "ValidationException occurred | CorrelationId: {CorrelationId} | " +
-                                    "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
-                                    "RequestBody: {RequestBody} | Headers: {@Headers} | " +
-                                    "ValidationErrors: {@ValidationErrors} | Message: {Message}",
-                                    errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
-                                    errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
-                                    validationEx.Errors, ex.Message);
+                        "ValidationException occurred | CorrelationId: {CorrelationId} | " +
+                        "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
+                        "RequestBody: {RequestBody} | Headers: {@Headers} | " +
+                        "ValidationErrors: {@ValidationErrors} | Message: {Message}",
+                        errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
+                        errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
+                        validationEx.Errors, ex.Message);
                     break;
 
                 case ConflictException:
                     statusCode = (int)HttpStatusCode.Conflict;
-                    error = ErrorResponse.From(ex.Message, traceId: context.TraceIdentifier);
+                    error = ErrorResponse.From(ex.Message, traceId: context.TraceIdentifier,
+                        path: context.Request.Path.Value, statusCode: statusCode);
                     logger.LogError(ex,
-                                    "ConflictException occurred | CorrelationId: {CorrelationId} | " +
-                                    "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
-                                    "RequestBody: {RequestBody} | Headers: {@Headers} | " +
-                                    "Message: {Message}",
-                                    errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
-                                    errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
-                                    ex.Message);
+                        "ConflictException occurred | CorrelationId: {CorrelationId} | " +
+                        "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
+                        "RequestBody: {RequestBody} | Headers: {@Headers} | " +
+                        "Message: {Message}",
+                        errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
+                        errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
+                        ex.Message);
                     break;
 
                 case NoPermissionException:
                     statusCode = (int)HttpStatusCode.Unauthorized;
-                    error = ErrorResponse.From(ex.Message, traceId: context.TraceIdentifier);
+                    error = ErrorResponse.From(ex.Message, traceId: context.TraceIdentifier,
+                        path: context.Request.Path.Value, statusCode: statusCode);
                     logger.LogError(ex,
-                                    "NoPermissionException occurred | CorrelationId: {CorrelationId} | " +
-                                    "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
-                                    "RequestBody: {RequestBody} | Headers: {@Headers} | " +
-                                    "Message: {Message}",
-                                    errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
-                                    errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
-                                    ex.Message);
+                        "NoPermissionException occurred | CorrelationId: {CorrelationId} | " +
+                        "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
+                        "RequestBody: {RequestBody} | Headers: {@Headers} | " +
+                        "Message: {Message}",
+                        errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
+                        errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
+                        ex.Message);
                     break;
 
                 default:
                     statusCode = (int)HttpStatusCode.InternalServerError;
                     var message = env.IsDevelopment() ? ex.Message : "Internal Server Error";
                     var stack = env.IsDevelopment() ? new List<string> { ex.StackTrace ?? "" } : null;
-                    error = ErrorResponse.From(message, stack, context.TraceIdentifier);
+                    error = ErrorResponse.From(message, stack, context.TraceIdentifier,
+                        path: context.Request.Path.Value, statusCode: statusCode);
 
                     // Log comprehensive error information for internal server errors
                     logger.LogCritical(ex,
-                                       "Unhandled exception occurred | CorrelationId: {CorrelationId} | " +
-                                       "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
-                                       "RequestBody: {RequestBody} | Headers: {@Headers} | " +
-                                       "QueryString: {QueryString} | UserAgent: {UserAgent} | " +
-                                       "ClientIpAddress: {ClientIpAddress} | ExceptionType: {ExceptionType} | " +
-                                       "Message: {Message} | StackTrace: {StackTrace} | " +
-                                       "InnerException: {InnerException} | Source: {Source} | " +
-                                       "TargetSite: {TargetSite} | Data: {@ExceptionData}",
-                                       errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
-                                       errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
-                                       errorContext.QueryString, errorContext.UserAgent, errorContext.ClientIpAddress,
-                                       ex.GetType().FullName, ex.Message, ex.StackTrace,
-                                       ex.InnerException?.ToString(), ex.Source, ex.TargetSite?.ToString(),
-                                       ex.Data);
+                        "Unhandled exception occurred | CorrelationId: {CorrelationId} | " +
+                        "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
+                        "RequestBody: {RequestBody} | Headers: {@Headers} | " +
+                        "QueryString: {QueryString} | UserAgent: {UserAgent} | " +
+                        "ClientIpAddress: {ClientIpAddress} | ExceptionType: {ExceptionType} | " +
+                        "Message: {Message} | StackTrace: {StackTrace} | " +
+                        "InnerException: {InnerException} | Source: {Source} | " +
+                        "TargetSite: {TargetSite} | Data: {@ExceptionData}",
+                        errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
+                        errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
+                        errorContext.QueryString, errorContext.UserAgent, errorContext.ClientIpAddress,
+                        ex.GetType().FullName, ex.Message, ex.StackTrace,
+                        ex.InnerException?.ToString(), ex.Source, ex.TargetSite?.ToString(),
+                        ex.Data);
                     break;
             }
 
@@ -122,11 +127,11 @@ public class ExceptionHandlingMiddleware(
             QueryString = context.Request.QueryString.Value ?? "",
             UserAgent = context.Request.Headers["User-Agent"].ToString(),
             ClientIpAddress = context.Request.Headers["X-Client-IP"].FirstOrDefault()
-                                                 ?? context.Connection.RemoteIpAddress?.MapToIPv4().ToString(),
+                              ?? context.Connection.RemoteIpAddress?.MapToIPv4().ToString(),
             RequestHeaders = SanitizeHeaders(context.Request.Headers),
             UserId = context.User?.Identity?.IsAuthenticated == true
-                                   ? context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-                                   : null,
+                ? context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                : null,
             ExceptionOccurredAt = DateTime.UtcNow
         };
 
@@ -153,11 +158,11 @@ public class ExceptionHandlingMiddleware(
         request.EnableBuffering();
 
         using var reader = new StreamReader(
-                                            request.Body,
-                                            encoding: Encoding.UTF8,
-                                            detectEncodingFromByteOrderMarks: false,
-                                            bufferSize: 1024,
-                                            leaveOpen: true);
+            request.Body,
+            encoding: Encoding.UTF8,
+            detectEncodingFromByteOrderMarks: false,
+            bufferSize: 1024,
+            leaveOpen: true);
 
         var body = await reader.ReadToEndAsync();
 
@@ -196,8 +201,8 @@ public class ExceptionHandlingMiddleware(
                 foreach (var property in element.EnumerateObject())
                 {
                     var isSensitive = sensitiveFields.Any(field =>
-                                                              property.Name.Contains(field,
-                                                               StringComparison.OrdinalIgnoreCase));
+                        property.Name.Contains(field,
+                            StringComparison.OrdinalIgnoreCase));
 
                     obj[property.Name] = isSensitive ? "[REDACTED]" : SanitizeJsonObject(property.Value);
                 }
@@ -233,8 +238,8 @@ public class ExceptionHandlingMiddleware(
         foreach (var header in headers)
         {
             var isSensitive = sensitiveHeaders.Any(sensitive =>
-                                                       header.Key.Contains(sensitive,
-                                                                           StringComparison.OrdinalIgnoreCase));
+                header.Key.Contains(sensitive,
+                    StringComparison.OrdinalIgnoreCase));
 
             sanitized[header.Key] = isSensitive ? "[REDACTED]" : string.Join(", ", header.Value);
         }

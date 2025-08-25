@@ -6,6 +6,8 @@ namespace Shortha.Middleware;
 
 public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<RequestResponseLoggingMiddleware> logger)
 {
+    private const int MaxLogBodyChars = 100_000; // ~100 KB
+
     public async Task InvokeAsync(HttpContext context)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -47,17 +49,17 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
             var sanitizedHeaders = SanitizeHeaders(request.Headers);
 
             logger.LogInformation(
-                                  "HTTP Request: {Method} {Path}{Query} | CorrelationId: {CorrelationId} | " +
-                                  "ContentType: {ContentType} | ContentLength: {ContentLength} | " +
-                                  "Headers: {@Headers} | Body: {Body}",
-                                  request.Method,
-                                  request.Path,
-                                  request.QueryString,
-                                  correlationId,
-                                  request.ContentType,
-                                  request.ContentLength,
-                                  sanitizedHeaders,
-                                  sanitizedBody);
+                "HTTP Request: {Method} {Path}{Query} | CorrelationId: {CorrelationId} | " +
+                "ContentType: {ContentType} | ContentLength: {ContentLength} | " +
+                "Headers: {@Headers} | Body: {Body}",
+                request.Method,
+                request.Path,
+                request.QueryString,
+                correlationId,
+                request.ContentType,
+                request.ContentLength,
+                sanitizedHeaders,
+                sanitizedBody);
         }
         catch (Exception ex)
         {
@@ -66,7 +68,7 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
     }
 
     private async Task LogResponseAsync(HttpContext context, string correlationId, long elapsedMs,
-                                        MemoryStream responseBodyStream)
+        MemoryStream responseBodyStream)
     {
         var response = context.Response;
 
@@ -78,16 +80,16 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
             var logLevel = response.StatusCode >= 400 ? LogLevel.Warning : LogLevel.Information;
 
             logger.Log(logLevel,
-                       "HTTP Response: {StatusCode} | CorrelationId: {CorrelationId} | " +
-                       "Duration: {ElapsedMs}ms | ContentType: {ContentType} | " +
-                       "ContentLength: {ContentLength} | Headers: {@Headers} | Body: {Body}",
-                       response.StatusCode,
-                       correlationId,
-                       elapsedMs,
-                       response.ContentType,
-                       response.ContentLength,
-                       sanitizedHeaders,
-                       responseBody);
+                "HTTP Response: {StatusCode} | CorrelationId: {CorrelationId} | " +
+                "Duration: {ElapsedMs}ms | ContentType: {ContentType} | " +
+                "ContentLength: {ContentLength} | Headers: {@Headers} | Body: {Body}",
+                response.StatusCode,
+                correlationId,
+                elapsedMs,
+                response.ContentType,
+                response.ContentLength,
+                sanitizedHeaders,
+                responseBody);
         }
         catch (Exception ex)
         {
@@ -104,11 +106,13 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
             return $"[Binary content: {request.ContentType}]";
 
         request.EnableBuffering();
-        var buffer = new byte[Convert.ToInt32(request.ContentLength)];
-        await request.Body.ReadExactlyAsync(buffer, 0, buffer.Length);
+        using var reader = new StreamReader(request.Body, Encoding.UTF8, detectEncodingFromByteOrderMarks: false,
+            bufferSize: 4096, leaveOpen: true);
+        var content = await reader.ReadToEndAsync();
         request.Body.Position = 0;
-
-        return Encoding.UTF8.GetString(buffer);
+        if (content.Length > MaxLogBodyChars)
+            content = content[..MaxLogBodyChars] + "...[truncated]";
+        return content;
     }
 
     private async Task<string> ReadResponseBodyAsync(MemoryStream responseBodyStream)
@@ -137,7 +141,6 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
         }
         catch
         {
-            // If not JSON, just check for sensitive keywords
             return body.Contains("password", StringComparison.OrdinalIgnoreCase) ? "[REDACTED]" : body;
         }
     }
