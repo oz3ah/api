@@ -9,6 +9,13 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
     private const int MaxLogBodyChars = 100_000; // ~100 KB
     private const int MaxResponseLogBytes = 64 * 1024; // 64 KB cap for response logging
 
+    private static readonly HashSet<string> SensitiveFieldNames = new(
+    [
+        "password", "pass", "pwd", "token", "access_token", "refresh_token", "secret", "apikey", "apiKey",
+        "authorization", "x-api-key"
+    ], StringComparer.OrdinalIgnoreCase);
+    private const string RedactedValue = "[REDACTED]";
+
     public async Task InvokeAsync(HttpContext context)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -166,49 +173,59 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
         }
     }
 
-    private object SanitizeJsonElement(JsonElement element)
+    private object? SanitizeJsonElement(JsonElement element)
     {
         switch (element.ValueKind)
         {
             case JsonValueKind.Object:
-                var obj = new Dictionary<string, object>();
+            {
+                var obj = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
                 foreach (var property in element.EnumerateObject())
                 {
+                    if (SensitiveFieldNames.Contains(property.Name))
+                    {
+                        obj[property.Name] = RedactedValue;
+                        continue;
+                    }
+
                     obj[property.Name] = SanitizeJsonElement(property.Value);
                 }
 
                 return obj;
-
+            }
             case JsonValueKind.Array:
-                return element.EnumerateArray().Select(SanitizeJsonElement).ToArray();
-
+            {
+                return element.EnumerateArray().Select(SanitizeJsonElement).ToList();
+            }
             case JsonValueKind.String:
                 return element.GetString();
-
             case JsonValueKind.Number:
-                return element.GetDecimal();
-
+                // Preserve numeric precision by keeping raw text if it can be parsed as long/double; otherwise use raw text
+                var raw = element.GetRawText();
+                if (long.TryParse(raw, out long l)) return l;
+                if (double.TryParse(raw, out double d)) return d;
+                // fallback: return as raw JsonElement clone so serializer writes it correctly
+                return element.Clone();
             case JsonValueKind.True:
             case JsonValueKind.False:
                 return element.GetBoolean();
-
             case JsonValueKind.Null:
                 return null;
-
             default:
-                return element.ToString();
+                return element.GetRawText();
         }
     }
 
     private Dictionary<string, string> SanitizeHeaders(IHeaderDictionary headers)
     {
-        var sanitized = new Dictionary<string, string>();
-
+        var sanitized = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var header in headers)
         {
-            sanitized[header.Key] = string.Join(", ", header.Value);
+            var name = header.Key;
+            var lower = name.ToLowerInvariant();
+            var isSensitive = lower == "authorization" || lower == "cookie" || lower == "set-cookie" || lower.Contains("api-key") || lower.Contains("apikey");
+            sanitized[name] = isSensitive ? RedactedValue : string.Join(", ", header.Value);
         }
-
         return sanitized;
     }
 
