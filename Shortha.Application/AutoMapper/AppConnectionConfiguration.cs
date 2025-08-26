@@ -8,7 +8,9 @@ public class AppConnectionConfiguration : Profile
 {
     public AppConnectionConfiguration()
     {
-        CreateMap<AppConnection, CreatedConnectionDto>().ReverseMap();
+        CreateMap<AppConnection, CreatedConnectionDto>()
+            .ForMember(dest => dest.ApiKey, (map) => map.MapFrom(src => src.ConnectKey))
+            .ReverseMap();
         CreateMap<AppConnection, UserConnectionDto>()
             .ReverseMap();
     }

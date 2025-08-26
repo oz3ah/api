@@ -1,9 +1,20 @@
 ﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace Shortha.Application
 {
     public class Crypto
     {
+        public static async Task<string> GenerateBodyHashAsync(string body)
+        {
+            using var sha256 = SHA256.Create();
+            var data = Encoding.UTF8.GetBytes(body);
+
+            var hashBytes = await Task.Run(() => sha256.ComputeHash(data));
+
+            return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+        }
+
         public static int GetRandomPrime()
         {
             int[] primes =

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shortha.Application.Dto.Requests.AppConnections;
 using Shortha.Application.Interfaces.Services;
@@ -36,7 +35,7 @@ namespace Shortha.Controllers
         public async Task<IActionResult> RevokeConnection([FromQuery] string connectionId)
         {
             await service.RevokeConnection(connectionId, User.GetUserId());
-            return Success<string>(null);
+            return Success<string>(null!);
         }
 
         [HttpGet]
@@ -48,6 +47,7 @@ namespace Shortha.Controllers
         }
 
         [HttpGet("status/{pairCode}")]
+        [SignedRequest]
         public async Task<IActionResult> GetConnectionStatus([FromRoute] string pairCode)
         {
             var connection = await service.IsConnectedByPairCode(pairCode);

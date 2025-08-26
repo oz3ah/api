@@ -11,7 +11,7 @@ public interface IAppConnectionService
         Dictionary<string, object>? deviceMetadata);
 
     Task<bool> ActivateConnection(string pairCode, string userId);
-    Task<AppConnection?> GetByApiKey(string apiKey);
+    Task<AppConnection?> GetByPairCode(string apiKey);
 
     Task RevokeConnection(string connectionId, string userId);
     Task<PaginationResult<UserConnectionDto>> GetAllByUserId(string userId, int page, int pageSize);

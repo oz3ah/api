@@ -109,6 +109,10 @@ namespace Shortha.Infrastructre.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("SecretKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
