@@ -52,14 +52,9 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
         return true;
     }
 
-    public async Task<AppConnection?> GetByApiKey(string apiKey)
+    public async Task<AppConnection?> GetByPairCode(string pairCode)
     {
-        var connection = await repo.GetAsync(e => e.ConnectKey == apiKey);
-        if (connection == null || !connection.IsValid())
-        {
-            return null;
-        }
-
+        var connection = await repo.GetAsync(e => e.PairCode == pairCode);
         return connection;
     }
 
@@ -78,7 +73,7 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
 
     public async Task<PaginationResult<UserConnectionDto>> GetAllByUserId(string userId, int page, int pageSize)
     {
-        var connections = await repo.GetAsync(e => e.UserId == userId, page, pageSize);
+        var connections = await repo.GetAsync(e => e.UserId == userId, page, pageSize, orderBy: c => c.CreatedAt, true);
         return mapper.Map<PaginationResult<UserConnectionDto>>(connections);
     }
 

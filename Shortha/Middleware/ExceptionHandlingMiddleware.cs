@@ -86,6 +86,21 @@ public class ExceptionHandlingMiddleware(
                         ex.Message);
                     break;
 
+                case BadHttpRequestException:
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    error = ErrorResponse.From(ex.Message, traceId: context.TraceIdentifier,
+                        path: context.Request.Path.Value,
+                        statusCode: statusCode);
+                    logger.LogError(ex,
+                        "NoPermissionException occurred | CorrelationId: {CorrelationId} | " +
+                        "Path: {Path} | Method: {Method} | UserId: {UserId} | " +
+                        "RequestBody: {RequestBody} | Headers: {@Headers} | " +
+                        "Message: {Message}",
+                        errorContext.CorrelationId, errorContext.RequestPath, errorContext.RequestMethod,
+                        errorContext.UserId, errorContext.RequestBody, errorContext.RequestHeaders,
+                        ex.Message);
+                    break;
+
                 default:
                     statusCode = (int)HttpStatusCode.InternalServerError;
                     var message = env.IsDevelopment() ? ex.Message : "Internal Server Error";

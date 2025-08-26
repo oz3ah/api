@@ -15,7 +15,7 @@ public class AppConnection : IBase
     public string? UserId { get; set; }
     public required string Version { get; set; }
     public string? ConnectKey { get; set; }
-    public required string SecretKey { private get; set; }
+    public required string SecretKey { get; set; }
     public required ConnectionDevice Device { get; set; }
     public Dictionary<string, string>? DeviceMetadata { get; set; }
 
@@ -28,4 +28,6 @@ public class AppConnection : IBase
     public bool IsValid() => Status == ConnectionStatus.Active && Status != ConnectionStatus.Revoked;
 
     public bool IsRevoked() => Status == ConnectionStatus.Revoked;
+
+    public string GetSecretKey() => SecretKey;
 }

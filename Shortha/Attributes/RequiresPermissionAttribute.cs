@@ -32,9 +32,17 @@ public class RequiresPermissionAttribute(PermissionMode mode, params string[] pe
                 }
                 case PermissionMode.Optional:
                 {
-                    var isPro = permissions.All(p => userPermissions.Contains(p));
+                    var isOneOfThem = permissions.All(p => userPermissions.Contains(p));
 
-                    context.HttpContext.Items["isPro"] = isPro;
+                    if (!isOneOfThem)
+                    {
+                        Log.Information(
+                            "User {UserId} attempted to access a feature requiring one of the following permissions: {Permissions}",
+                            userId, string.Join(", ", permissions));
+                    }
+
+                    throw new NoPermissionException("This action requires a Pro account");
+
                     break;
                 }
             }
