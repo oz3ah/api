@@ -15,13 +15,15 @@ namespace Shortha.Controllers
     public class UrlController(IUrlService urlService) : Base
     {
         [HttpPost("create")]
+        [SignedRequest(false)]
         [AllowAnonymous]
-        [RequiresPermission(PermissionMode.Optional, "create:expire", "create:custom")]
+        [RequiresPermission(PermissionMode.Optional, "create:expire", "create:custom", "create:url")]
         public async Task<IActionResult> CreateNew([FromBody] UrlCreateRequest submittedUrl)
         {
             var userId = User.GetUserIdOrNull();
             var userPermissions = User.GetPermissions();
-            var authSource = User.Identity?.AuthenticationType ?? "Unknown";
+            var authSource = User.Identity?.AuthenticationType ??
+                             HttpContext.Items["AuthSource"]?.ToString() ?? "Unknown";
 
             var url = await urlService.CreateUrl(submittedUrl, userId, userPermissions, authSource);
             return Success(url);
