@@ -5,6 +5,5 @@ public enum UrlCreationSource
     HomePage,
     ProfilePage,
     ApiKey,
-    ChromeExtension,
-    DesktopApp,
+    ConnectedApp,
 }

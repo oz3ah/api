@@ -1,11 +1,14 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Shortha.Application.Interfaces.Services;
+﻿using Microsoft.AspNetCore.Mvc;
 using Shortha.Filters;
 
 namespace Shortha.Attributes
 {
-    public class SignedRequestAttribute() : TypeFilterAttribute(typeof(SignedRequestFilter));
+    public class SignedRequestAttribute : TypeFilterAttribute
+    {
+        public SignedRequestAttribute(bool isRequired = true)
+            : base(typeof(SignedRequestFilter))
+        {
+            Arguments = [isRequired];
+        }
+    }
 }

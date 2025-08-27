@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -7,17 +8,31 @@ using Shortha.Application.Interfaces.Services;
 
 namespace Shortha.Filters
 {
-    public class SignedRequestFilter(IAppConnectionService appConnectionService) : IAsyncActionFilter
+    public class SignedRequestFilter(IAppConnectionService appConnectionService, bool isRequired) : IAsyncActionFilter
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var headers = context.HttpContext.Request.Headers;
+
+            if (!isRequired && !headers.ContainsKey("X-Signature"))
+            {
+                await next();
+                return;
+            }
+
 
             if (!headers.TryGetValue("X-Signature", out var signature) ||
                 !headers.TryGetValue("X-Timestamp", out var timestamp))
             {
                 throw new BadHttpRequestException("Don't manipulate the request");
             }
+
+            if (!long.TryParse(timestamp, out var ts))
+                throw new BadHttpRequestException("Invalid timestamp");
+
+            var requestTime = DateTimeOffset.FromUnixTimeSeconds(ts);
+            if (DateTimeOffset.UtcNow - requestTime > TimeSpan.FromMinutes(1))
+                throw new BadHttpRequestException("Expired signature");
 
             var pairCode = headers["X-Pair-Code"].ToString();
 
@@ -31,11 +46,19 @@ namespace Shortha.Filters
 
             // --- Read body properly ---
             context.HttpContext.Request.EnableBuffering();
+
             string body;
-            using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8, leaveOpen: true))
+            context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
+
+            using (var reader = new StreamReader(
+                       context.HttpContext.Request.Body,
+                       encoding: Encoding.UTF8,
+                       detectEncodingFromByteOrderMarks: false,
+                       bufferSize: 1024,
+                       leaveOpen: true))
             {
                 body = await reader.ReadToEndAsync();
-                context.HttpContext.Request.Body.Position = 0;
+                context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
             }
 
             var hashedBody = await Crypto.GenerateBodyHashAsync(body);
@@ -52,6 +75,15 @@ namespace Shortha.Filters
             {
                 throw new BadHttpRequestException("Invalid Signature");
             }
+
+            context.HttpContext.Items["AuthSource"] = "AppConnection";
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, user.UserId),
+                new("permissions", "create:url")
+            };
+            var identity = new ClaimsIdentity(claims, "SignedRequest");
+            context.HttpContext.User = new ClaimsPrincipal(identity);
 
             await next(); // continue pipeline
         }

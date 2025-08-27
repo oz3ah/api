@@ -25,6 +25,7 @@ namespace Shortha.Application.Services
             {
                 "AuthenticationTypes.Federation" => UrlCreationSource.ProfilePage,
                 "ApiKey" => UrlCreationSource.ApiKey,
+                "SignedRequest" => UrlCreationSource.ConnectedApp,
                 _ => UrlCreationSource.HomePage
             };
         }
