@@ -8,7 +8,7 @@ namespace Shortha.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class AnalyticsController(ILogger<AnalyticsController> logger, IAnalyticsService analytics) : Base
+    public class AnalyticsController(IAnalyticsService analytics) : Base
     {
         [HttpGet]
         public async Task<IActionResult> BasicAnalytics()
