@@ -79,14 +79,18 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
 
     public async Task<ConnectionStatusDto> IsConnectedByPairCode(string pairCode)
     {
-        var connection = await repo.GetAsync(e => e.PairCode == pairCode);
+        var connection = await repo.GetAsync(e => e.PairCode == pairCode, includes: ["User"]);
 
 
         return new ConnectionStatusDto()
         {
             IsActive = connection?.IsValid() ?? false,
             IsRevoked = connection?.IsRevoked() ?? false,
-            IsExist = connection != null
+            IsExist = connection != null,
+            ConnectedSince = connection?.ActivatedAt,
+            Username = connection?.User?.Name,
+            Email = connection?.User?.Email,
+            Photo = connection?.User?.Picture
         };
     }
 }

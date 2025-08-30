@@ -76,14 +76,17 @@ namespace Shortha.Filters
                 throw new BadHttpRequestException("Invalid Signature");
             }
 
-            context.HttpContext.Items["AuthSource"] = "AppConnection";
-            var claims = new List<Claim>
+            if (user.UserId != null)
             {
-                new(ClaimTypes.NameIdentifier, user.UserId),
-                new("permissions", "create:url")
-            };
-            var identity = new ClaimsIdentity(claims, "SignedRequest");
-            context.HttpContext.User = new ClaimsPrincipal(identity);
+                context.HttpContext.Items["AuthSource"] = "AppConnection";
+                var claims = new List<Claim>
+                {
+                    new(ClaimTypes.NameIdentifier, user.UserId),
+                    new("permissions", "create:url")
+                };
+                var identity = new ClaimsIdentity(claims, "SignedRequest");
+                context.HttpContext.User = new ClaimsPrincipal(identity);
+            }
 
             await next(); // continue pipeline
         }
