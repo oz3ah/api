@@ -58,16 +58,15 @@ public class AppConnectionService(IAppConnectionRepository repo, IMapper mapper)
         return connection;
     }
 
-    public async Task RevokeConnection(string keyId, string userId)
+    public async Task RevokeConnection(string pairCode, string userId)
     {
-        var existingConnection = await repo.GetAsync(e => e.Id == keyId && e.UserId == userId);
+        var existingConnection = await repo.GetAsync(e => e.PairCode == pairCode && e.UserId == userId);
         if (existingConnection == null || !existingConnection.IsValid())
         {
             throw new NotFoundException("The connection is not valid or already revoked");
         }
 
         existingConnection.Revoke();
-        repo.Update(existingConnection);
         await repo.SaveAsync();
     }
 
