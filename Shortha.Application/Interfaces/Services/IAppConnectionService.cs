@@ -13,7 +13,7 @@ public interface IAppConnectionService
     Task<bool> ActivateConnection(string pairCode, string userId);
     Task<AppConnection?> GetByPairCode(string apiKey);
 
-    Task RevokeConnection(string connectionId, string userId);
+    Task RevokeConnection(string pairCode, string userId);
     Task<PaginationResult<UserConnectionDto>> GetAllByUserId(string userId, int page, int pageSize);
     Task<ConnectionStatusDto> IsConnectedByPairCode(string pairCode);
 }
