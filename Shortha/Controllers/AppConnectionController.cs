@@ -32,7 +32,7 @@ namespace Shortha.Controllers
 
         [HttpDelete]
         [Authorize]
-        public async Task<IActionResult> RevokeConnection([FromQuery] string pairCode)
+        public async Task<IActionResult> RevokeConnection([FromRoute] string pairCode)
         {
             await service.RevokeConnection(pairCode, User.GetUserId());
             return Success<string>(null!);
