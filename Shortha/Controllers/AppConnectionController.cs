@@ -30,7 +30,7 @@ namespace Shortha.Controllers
             return Success(result);
         }
 
-        [HttpDelete]
+        [HttpDelete("{pairCode}")]
         [Authorize]
         public async Task<IActionResult> RevokeConnection([FromRoute] string pairCode)
         {
