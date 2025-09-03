@@ -18,6 +18,7 @@ internal static class Services
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IApiKeyService, ApiKeyService>();
         services.AddScoped<IAppConnectionService, AppConnectionService>();
+        services.AddScoped<IActivityService, ActivityService>();
 
 
         return services;
