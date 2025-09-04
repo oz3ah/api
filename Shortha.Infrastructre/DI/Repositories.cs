@@ -20,6 +20,7 @@ public static class Repositories
         services.AddScoped<IApiRepository, ApiRepository>();
         services.AddScoped<IAppConnectionRepository, AppConnectionRepository>();
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+        services.AddScoped<IActivityRepository, ActivityRepository>();
 
         return services;
     }
