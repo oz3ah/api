@@ -38,7 +38,7 @@ public class KahsierService(ISecretService secretService) : IKahsierService
         query["amount"] = package.Price.ToString();
         query["currency"] = "EGP";
         query["hash"] = CreateHash(package.Price, paymentHash);
-        query["mode"] = "test";
+        query["mode"] = Environment.GetEnvironmentVariable("Env") == "dev" ? "test" : "live";
         query["interactionSource"] = "Ecommerce";
         query["enable3DS"] = "true";
         query["metaData"] = paymentHash;
