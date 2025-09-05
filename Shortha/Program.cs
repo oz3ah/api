@@ -12,6 +12,7 @@ using Shortha.Infrastructre.DI;
 using Shortha.Middleware;
 using Shortha.Providers;
 using Microsoft.AspNetCore.Mvc; // added for ApiBehaviorOptions
+using Microsoft.EntityFrameworkCore;
 
 namespace Shortha
 {
@@ -74,6 +75,21 @@ namespace Shortha
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
+                
+                // Apply database migrations
+                try
+                {
+                    var context = services.GetRequiredService<AppDb>();
+                    context.Database.Migrate();
+                    Log.Information("Database migrations applied successfully");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "An error occurred while applying database migrations");
+                    throw;
+                }
+                
+                // Seed initial data
                 Seeder.SeedPackagesAsync(services).Wait();
             }
 
