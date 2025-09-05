@@ -34,8 +34,8 @@ RUN echo '#!/bin/bash\n\
     echo "Migrations completed successfully"\n\
     exec "$@"' > /app/migrate-and-run.sh && chmod +x /app/migrate-and-run.sh
 
-# Use the official ASP.NET Core runtime image for the final stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# Use the official ASP.NET Core SDK image for the final stage (needed for EF tools)
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS final
 WORKDIR /app
 
 # Install EF Core tools for migrations
