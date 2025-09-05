@@ -18,7 +18,7 @@ public static class Seeder
         dbProvider.Packages.Add(new Package
         {
             Name = PackagesName.Pro,
-            Price = 270.0m,
+            Price = 114.0m,
             MaxUrls = -1,
             CreatedAt = DateTime.UtcNow,
             Description =
