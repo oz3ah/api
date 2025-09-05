@@ -48,7 +48,7 @@ public class KahsierService(ISecretService secretService) : IKahsierService
 
         // Append the URLs manually
         queryString += $"&merchantRedirect={secretService.GetSecret("PaymentCallbackURL")}";
-        queryString += "&serverWebhook=https://shortha.gitnasr.com/api/Subscription/payment";
+        queryString += "&serverWebhook=https://api.oz3a.top/api/Subscription/payment";
 
         var uri = $"{BaseUrl}?{queryString}";
 
