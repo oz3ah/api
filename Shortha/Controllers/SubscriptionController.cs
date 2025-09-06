@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shortha.Application.Dto.Requests.Subscription;
 using Shortha.Application.Dto.Webhook.Kashier;
+using Shortha.Application.Interfaces.Services;
 using Shortha.Application.Services;
 using Shortha.Extenstions;
 
@@ -32,7 +34,7 @@ public class SubscriptionController(
             return Fail("No Webhook Data");
         }
 
-        if (webhookData.Event != "pay") return Success("Nevermind");
+        if (webhookData.Event != "pay") return Success("Never mind");
 
         logger.LogInformation("Webhook : {KashierWebhookDto}", webhookData);
 
@@ -41,7 +43,7 @@ public class SubscriptionController(
             webhookData.Data.Method, webhookData.Data.Currency);
 
         await userService.ChangeSubscriptionType(updated.UserId, true);
-        await userService.AlternateUserRole("Pro", updated.UserId);
+        await userService.AlternateUserRole("PRO", updated.UserId);
 
         return Success("Done");
     }

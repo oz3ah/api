@@ -75,7 +75,7 @@ namespace Shortha
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                
+
                 // Apply database migrations
                 try
                 {
@@ -88,9 +88,9 @@ namespace Shortha
                     Log.Error(ex, "An error occurred while applying database migrations");
                     throw;
                 }
-                
+
                 // Seed initial data
-                Seeder.SeedPackagesAsync(services).Wait();
+                Seeder.Seed(services);
             }
 
             app.UseHangfireDashboard("/dashboard");

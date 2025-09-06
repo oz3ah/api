@@ -17,15 +17,13 @@ namespace Shortha.Controllers
         [HttpPost("create")]
         [SignedRequest(false)]
         [AllowAnonymous]
-        [RequiresPermission(PermissionMode.Optional, "create:expire", "create:custom", "create:url")]
         public async Task<IActionResult> CreateNew([FromBody] UrlCreateRequest submittedUrl)
         {
             var userId = User.GetUserIdOrNull();
-            var userPermissions = User.GetPermissions();
             var authSource = User.Identity?.AuthenticationType ??
                              HttpContext.Items["AuthSource"]?.ToString() ?? "Unknown";
 
-            var url = await urlService.CreateUrl(submittedUrl, userId, userPermissions, authSource);
+            var url = await urlService.CreateUrl(submittedUrl, userId, User.IsPro(), authSource);
             return Success(url);
         }
 

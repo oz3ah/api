@@ -17,6 +17,7 @@ namespace Shortha.Infrastructre
 
         public DbSet<Package> Packages { get; set; } = null!;
         public DbSet<AuditTrail> AuditTrails { get; set; } = null!;
+        public DbSet<Role> Roles { get; set; } = null!;
 
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
