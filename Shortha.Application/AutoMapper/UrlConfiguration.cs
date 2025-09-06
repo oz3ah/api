@@ -3,7 +3,7 @@ using Shortha.Application.Dto.Requests.Url;
 using Shortha.Application.Dto.Responses.Url;
 using Shortha.Domain.Entites;
 
-namespace Shortha.Application.Dto.AutoMapper
+namespace Shortha.Application.AutoMapper
 {
     public class UrlConfiguration : Profile
     {

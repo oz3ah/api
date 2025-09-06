@@ -3,10 +3,9 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Shortha.Application.Interfaces;
 using Shortha.Application.Services;
 
-namespace Shortha.Authentication;
+namespace Shortha.Infrastructre.Authentication;
 
 public class ApiKeyAuthenticationHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,

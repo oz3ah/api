@@ -4,19 +4,25 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Shortha.Application.Interfaces;
-using Shortha.Authentication;
 using Shortha.Domain.Dto;
 using Shortha.Domain.Interfaces;
-using Shortha.Infrastructre.Auth0;
+using Shortha.Infrastructre.Authentication;
+using System.Text;
 
 namespace Shortha.Infrastructre.DI
 {
-    internal static class Auth0
+    internal static class Auth
     {
-        public static IServiceCollection AddAuth0(this IServiceCollection services)
+        public static IServiceCollection AddAuthenticationService(this IServiceCollection services)
         {
-            var secretManager = services.BuildServiceProvider().GetRequiredService<ISecretService>();
+            var sp = services.BuildServiceProvider();
+            var secretManager = sp.GetRequiredService<ISecretService>();
+
+            var jwtSecret = secretManager.GetSecret("JwtSecret");
+            var jwtAudience = secretManager.GetSecret("JwtAudience");
+
             services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = "SmartScheme";
@@ -26,27 +32,37 @@ namespace Shortha.Infrastructre.DI
                 {
                     options.ForwardDefaultSelector = context =>
                     {
-                        if (context.Request.Headers.ContainsKey("X-API-Key".ToLower()))
+                        // Check API key
+                        if (context.Request.Headers.ContainsKey("x-api-key"))
                             return "ApiKey";
 
+                        // Otherwise fallback to JWT
                         return JwtBearerDefaults.AuthenticationScheme;
                     };
                 })
-                .AddJwtBearer(options =>
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
-                    options.Authority = secretManager.GetSecret("Authority");
-                    options.Audience = secretManager.GetSecret("Audience");
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
+                        ValidateIssuer = false,
+
+                        ValidateAudience = true,
+                        ValidAudience = jwtAudience,
+
+                        ValidateLifetime = true,
+
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+
                         NameClaimType = ClaimTypes.NameIdentifier
                     };
+
                     options.Events = new JwtBearerEvents
                     {
                         OnChallenge = context =>
                         {
                             context.HandleResponse();
-                            context.Response.StatusCode =
-                                StatusCodes.Status401Unauthorized;
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                             context.Response.ContentType = "application/json";
 
                             var error = ErrorResponse.From("Unauthorized access",
@@ -54,22 +70,10 @@ namespace Shortha.Infrastructre.DI
                             return context.Response.WriteAsJsonAsync(error);
                         }
                     };
-                }).AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
-            ;
-
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(
-                    "create:url",
-                    policy => policy.Requirements.Add(
-                        new HasScopeRequirement("create:url", secretManager.GetSecret("Authority"))
-                    )
-                );
-            });
+                })
+                .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
             services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
-
-            services.AddScoped<IAuth0ManagementService, Auth0ManagementService>();
 
             return services;
         }

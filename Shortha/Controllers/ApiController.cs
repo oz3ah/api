@@ -15,9 +15,7 @@ namespace Shortha.Controllers
         [Authorize]
         public async Task<IActionResult> CreateNewKey([FromBody] CreateApiKeyDto apiKeyDto)
         {
-            var permissions = User.GetPermissions();
-
-            var isPro = permissions.Contains("api:create");
+            var isPro = User.IsPro();
 
             if (!isPro)
             {
