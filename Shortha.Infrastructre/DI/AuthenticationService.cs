@@ -73,7 +73,6 @@ namespace Shortha.Infrastructre.DI
                 })
                 .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
-            services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
 
             return services;
         }
