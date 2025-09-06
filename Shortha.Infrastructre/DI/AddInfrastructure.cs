@@ -9,12 +9,11 @@ public static class Infrastructure
     {
         services.AddSecretManager();
         services.AddIpTracker();
-        services.AddAuth0();
+        services.AddAuthenticationService();
         services.AddDatabase();
         services.AddRepositories();
         services.AddSingleton<SoftDeleteInterceptor>();
         services.AddSingleton<AuditableInterceptor>();
-        services.AddApiClients();
         services.RegisterHangfire();
 
         return services;

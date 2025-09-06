@@ -22,6 +22,8 @@ public static class Repositories
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
         services.AddScoped<IActivityRepository, ActivityRepository>();
 
+        services.AddScoped<IRoleRepository, RoleRepository>();
+
         return services;
     }
 }

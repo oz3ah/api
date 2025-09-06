@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace Shortha.Infrastructre.Auth0
+namespace Shortha.Infrastructre.Authentication
 {
     public class HasScopeRequirement(string scope, string issuer) : IAuthorizationRequirement
     {

@@ -19,11 +19,11 @@
         public string Provider { get; set; } = null!;
         public virtual ICollection<Visit> Visits { get; set; } = new HashSet<Visit>();
         public virtual ICollection<Api> Apis { get; set; } = new List<Api>();
-
         public virtual ICollection<Url> Urls { get; set; } = new List<Url>();
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
         public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
-
         public virtual ICollection<AppConnection> Extensions { get; set; } = new List<AppConnection>();
+        public string RoleId { get; set; } = null!;
+        public virtual Role Role { get; set; } = null!;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Shortha.Controllers;
+﻿namespace Shortha.Application.Dto.Requests.Subscription;
 
 public class SubscribeDto
 {

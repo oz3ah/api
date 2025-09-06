@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using IPinfo;
 using Shortha.Application.Dto.Responses.Visit;
+using Shortha.Application.Interfaces.Services;
+using Shortha.Application.Tracker;
 using Shortha.Domain;
 using Shortha.Domain.Dto;
 using Shortha.Domain.Entites;
@@ -10,7 +12,7 @@ namespace Shortha.Application.Services
 {
     public class VisitService(IVisitRepository repo, IMapper mapper, IPinfoClient client) : IVisitService
     {
-        private async Task<Tracker> DispatchTracker(RequestInfo request)
+        private async Task<Domain.Tracker> DispatchTracker(RequestInfo request)
         {
             var tracker = new TrackerBuilder(request.UserAgent)
                 .WithBrowser()

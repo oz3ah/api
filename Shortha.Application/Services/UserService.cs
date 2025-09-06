@@ -1,49 +1,63 @@
-﻿using Shortha.Application.Dto.Responses.Url;
+﻿using Google.Apis.Auth;
+using Shortha.Application.Dto.Responses.Url;
 using Shortha.Application.Exceptions;
 using Shortha.Application.Interfaces;
+using Shortha.Application.Interfaces.Services;
 using Shortha.Domain.Entites;
 using Shortha.Domain.Interfaces.Repositories;
 
 namespace Shortha.Application.Services;
 
-public class UserService(IUserRepository repository, IAuth0ManagementService auth0, IAnalyticsService analyticsService)
+public class UserService(
+    IUserRepository repository,
+    IAnalyticsService analyticsService,
+    IRoleRepository roleRepository,
+    ITokenService tokenService)
     : IUserService
 {
-    public async Task<AppUser> CreateUserAsync(string userId)
+    public async Task<string> CreateUserAsync(string token)
     {
-        var user = await auth0.GetUserInfoAsync(userId);
+        var payload = await GoogleJsonWebSignature.ValidateAsync(token);
 
-        if (user == null)
+
+        if (payload == null)
         {
-            throw new NotFoundException("User not found in Auth0");
+            throw new NotFoundException("User not found in Google");
         }
 
         // Check if the user already exists in the repository
-        var existingUser = await repository.GetByIdAsync(userId);
+        var existingUser = await repository.GetByIdAsync(payload.Subject);
         if (existingUser != null)
         {
             // Update the existing user with new information
-            existingUser.LastLoginAt = user.LastLogin;
+            existingUser.LastLoginAt = DateTime.UtcNow;
             await repository.SaveAsync();
-            return existingUser;
+
+            return tokenService.GenerateToken(existingUser.Id, existingUser.Email,
+                existingUser.IsPremium ? "PRO" : "FREE");
         }
 
         var newUser = new AppUser
         {
-            Id = user.UserId,
-            Email = user.Email,
-            Name = user.Name,
-            Picture = user.Picture,
-            CreatedAt = user.CreatedAt,
-            LastLoginAt = user.LastLogin,
-            Provider = user.Identities.First().Provider,
+            Id = payload.Subject,
+
+            Email = payload.Email,
+            Name = payload.Name,
+            Picture = payload.Picture,
+            CreatedAt = DateTime.UtcNow,
+            LastLoginAt = DateTime.UtcNow,
+            Provider = "Google",
+            IsPremium = false,
+            Role = await GetRoleByName("FREE")
         };
 
-        await auth0.AssignRoleToUser("Free", user.UserId);
 
         await repository.AddAsync(newUser);
         await repository.SaveAsync();
-        return newUser;
+
+
+        return tokenService.GenerateToken(newUser.Id, newUser.Email, "FREE");
+        ;
     }
 
     public async Task<(AppUser, UserUrlStatsResponse)> GetUserById(string userId)
@@ -65,7 +79,16 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
 
     public async Task AlternateUserRole(string newRole, string userId)
     {
-        await auth0.AssignRoleToUser(newRole, userId);
+        var user = await repository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            throw new NotFoundException("User not found");
+        }
+
+        var role = await GetRoleByName(newRole);
+        user.Role = role;
+        user.IsPremium = newRole == "PRO";
+        await repository.SaveAsync();
     }
 
     public async Task<bool> IsUserPremium(string userId)
@@ -77,5 +100,16 @@ public class UserService(IUserRepository repository, IAuth0ManagementService aut
         }
 
         return user.IsPremium;
+    }
+
+    private async Task<Role> GetRoleByName(string name)
+    {
+        var role = await roleRepository.GetAsync(r => r.Name == name);
+        if (role == null)
+        {
+            throw new NotFoundException("Role not found");
+        }
+
+        return role;
     }
 }

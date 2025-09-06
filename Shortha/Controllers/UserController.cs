@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shortha.Application.Interfaces.Services;
 using Shortha.Application.Services;
 using Shortha.Extenstions;
 
@@ -9,13 +10,10 @@ namespace Shortha.Controllers
     [ApiController]
     public class UserController(IUserService userService) : Base
     {
-        [Authorize]
         [HttpGet("sync")]
-        public async Task<IActionResult> Sync()
+        public async Task<IActionResult> Sync([FromQuery] string token)
         {
-            var userId = User.GetUserId();
-
-            var user = await userService.CreateUserAsync(userId);
+            var user = await userService.CreateUserAsync(token);
 
             return Success(user);
         }

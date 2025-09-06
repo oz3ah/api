@@ -6,7 +6,36 @@ namespace Shortha.Infrastructre;
 
 public static class Seeder
 {
-    public static async Task SeedPackagesAsync(IServiceProvider serviceProvider)
+    public static void Seed(IServiceProvider serviceProvider)
+    {
+        SeedPackagesAsync(serviceProvider).GetAwaiter().GetResult();
+        SeedRolesAsync(serviceProvider).GetAwaiter().GetResult();
+    }
+
+    private static async Task SeedRolesAsync(IServiceProvider serviceProvider)
+    {
+        var dbProvider = serviceProvider.GetRequiredService<AppDb>();
+        // Check if the roles already exist
+        if (dbProvider.Roles.Any())
+        {
+            return; // Roles already exist, no need to seed
+        }
+
+        dbProvider.Roles.Add(new Role
+        {
+            Name = "FREE",
+            CreatedAt = DateTime.UtcNow
+        });
+        dbProvider.Roles.Add(new Role
+        {
+            Name = "PRO",
+            CreatedAt = DateTime.UtcNow
+        });
+        await dbProvider.SaveChangesAsync();
+    }
+
+
+    private static async Task SeedPackagesAsync(IServiceProvider serviceProvider)
     {
         var dbProvider = serviceProvider.GetRequiredService<AppDb>();
         // Check if the packages already exist
@@ -35,6 +64,7 @@ public static class Seeder
             Description = "Perfect for individuals and casual users who want fast, simple link shortening.",
             DurationInDays = 36500
         });
+
         await dbProvider.SaveChangesAsync();
     }
 }
