@@ -184,6 +184,10 @@ namespace Shortha.Infrastructre.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -192,6 +196,8 @@ namespace Shortha.Infrastructre.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
                 });
@@ -356,6 +362,45 @@ namespace Shortha.Infrastructre.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("Shortha.Domain.Entites.Role", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("IsActive")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying(1)")
+                        .HasDefaultValue("1");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Shortha.Domain.Entites.Subscription", b =>
@@ -584,6 +629,17 @@ namespace Shortha.Infrastructre.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Shortha.Domain.Entites.AppUser", b =>
+                {
+                    b.HasOne("Shortha.Domain.Entites.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("Shortha.Domain.Entites.AuditTrail", b =>
                 {
                     b.HasOne("Shortha.Domain.Entites.AppUser", "User")
@@ -697,6 +753,11 @@ namespace Shortha.Infrastructre.Migrations
                     b.Navigation("Payments");
 
                     b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("Shortha.Domain.Entites.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Shortha.Domain.Entites.Url", b =>

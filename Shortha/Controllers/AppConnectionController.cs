@@ -22,9 +22,13 @@ namespace Shortha.Controllers
 
         [Authorize]
         [HttpPost("{pairCode}")]
-        [RequiresPermission(PermissionMode.RequireAll, "connection:create")]
         public async Task<IActionResult> ActivateConnection([FromRoute] string pairCode)
         {
+            if (User.IsPro() == false)
+            {
+                return Fail("You need a Pro Subscription to be able to connect apps");
+            }
+
             var userId = User.GetUserId();
             var result = await service.ActivateConnection(pairCode, userId);
             return Success(result);

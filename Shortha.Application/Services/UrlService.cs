@@ -31,19 +31,19 @@ namespace Shortha.Application.Services
         }
 
         public async Task<UrlResponse> CreateUrl(UrlCreateRequest urlCreate, string? userId,
-            HashSet<string> permissions, string source)
+            bool isPro, string source)
         {
-            if (!permissions.Contains("create:custom") && !string.IsNullOrWhiteSpace(urlCreate.CustomHash))
+            if (!isPro && !string.IsNullOrWhiteSpace(urlCreate.CustomHash))
                 throw new NoPermissionException("Custom URL is only available for premium users.");
 
-            if (!permissions.Contains("create:expire") && urlCreate.ExpiresAt.HasValue)
+            if (!isPro && urlCreate.ExpiresAt.HasValue)
                 throw new NoPermissionException("Expiration date is only available for premium users.");
 
             var url = new Url
             {
                 OriginalUrl = urlCreate.Url,
                 UserId = userId,
-                ExpiresAt = permissions.Contains("create:expire") ? urlCreate.ExpiresAt : null,
+                ExpiresAt = isPro ? urlCreate.ExpiresAt : null,
                 CreationSource = MapSource(source)
             };
 

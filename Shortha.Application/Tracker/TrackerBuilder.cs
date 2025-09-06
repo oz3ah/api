@@ -1,11 +1,10 @@
 ﻿using DeviceDetectorNET;
-using Shortha.Domain;
 
-namespace Shortha.Application;
+namespace Shortha.Application.Tracker;
 
 public class TrackerBuilder
 {
-    private readonly Tracker _tracker = new();
+    private readonly Domain.Tracker _tracker = new();
     private readonly DeviceDetector _deviceDetector;
 
     public TrackerBuilder(string userAgent)
@@ -71,7 +70,7 @@ public class TrackerBuilder
         return this;
     }
 
-    public Tracker Build()
+    public Domain.Tracker Build()
     {
         return _tracker;
     }
