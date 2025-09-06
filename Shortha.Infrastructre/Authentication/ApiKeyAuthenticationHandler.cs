@@ -45,7 +45,7 @@ public class ApiKeyAuthenticationHandler(
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, apiKey.User.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, apiKey.User.Id),
             new Claim(ClaimTypes.Name, apiKey.User.Name),
             new Claim("Subscription", "Premium")
         };
