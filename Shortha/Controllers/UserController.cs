@@ -13,9 +13,13 @@ namespace Shortha.Controllers
         [HttpGet("sync")]
         public async Task<IActionResult> Sync([FromQuery] string token)
         {
-            var user = await userService.CreateUserAsync(token);
+            var exchangedToken = await userService.CreateUserAsync(token);
 
-            return Success(user);
+            return Success(new
+            {
+                token = exchangedToken,
+                expires_in = 3600
+            });
         }
 
         [Authorize]
