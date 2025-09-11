@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Shortha.Application.Dto.Requests.Url;
 using Shortha.Application.Interfaces.Services;
+using Shortha.Attributes;
 using Shortha.Extenstions;
 using Shortha.Filters;
-using System.Security.Claims;
-using Shortha.Attributes;
-using Shortha.Domain.Enums;
 
 namespace Shortha.Controllers
 {
@@ -27,7 +25,7 @@ namespace Shortha.Controllers
             return Success(url);
         }
 
-        [HttpGet("deactivate/{id}")]
+        [HttpDelete("deactivate/{id}")]
         [Authorize]
         public async Task<IActionResult> DeactivateUrl(string id)
         {
