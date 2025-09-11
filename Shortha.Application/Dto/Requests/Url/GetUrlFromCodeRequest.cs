@@ -16,8 +16,8 @@ public class GetUrlFromHashRequestValidator : AbstractValidator<GetUrlFromCodeRe
         RuleFor(x => x.Hash)
             .NotEmpty()
             .WithMessage("Hash cannot be empty.")
-            .Length(3, 10)
-            .WithMessage("Hash length must be between 3 and 10 characters.");
+            .Length(3, 30)
+            .WithMessage("Hash length must be between 3 and 30 characters.");
 
         RuleFor(x => x.Fingerprint)
             .NotEmpty()
