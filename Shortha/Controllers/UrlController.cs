@@ -25,7 +25,7 @@ namespace Shortha.Controllers
             return Success(url);
         }
 
-        [HttpDelete("deactivate/{id}")]
+        [HttpPost("deactivate/{id}")]
         [Authorize]
         public async Task<IActionResult> DeactivateUrl(string id)
         {
