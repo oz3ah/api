@@ -30,6 +30,9 @@ public class AppConnectionConfiguration : IEntityTypeConfiguration<AppConnection
             .HasConversion<string>()
             .IsRequired();
 
+        builder.Property(e => e.DeviceMetadata)
+            .HasColumnType("hstore");
+
         builder.HasOne(e => e.User)
             .WithMany(e => e.Extensions)
             .HasForeignKey(e => e.UserId)
